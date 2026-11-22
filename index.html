@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>APEX MENTOR — Progressive AI Study Commander</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          animation: {
+            'pulse-crimson': 'pulseCrimson 1.2s cubic-bezier(0.24, 0, 0.38, 1) infinite',
+            'pulse-amber': 'pulseAmber 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite',
+          },
+          keyframes: {
+            pulseCrimson: {
+              '0%, 100%': { boxShadow: '0 0 0 0 rgba(244, 63, 94, 0.7)' },
+              '50%': { boxShadow: '0 0 0 22px rgba(244, 63, 94, 0)' },
+            },
+            pulseAmber: {
+              '0%, 100%': { boxShadow: '0 0 0 0 rgba(245, 158, 11, 0.6)' },
+              '50%': { boxShadow: '0 0 0 16px rgba(245, 158, 11, 0)' },
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    .hud-glass { background: rgba(9, 9, 11, 0.88); backdrop-filter: blur(12px); }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200 overflow-x-hidden">
+
+  <!-- ===================================================================== -->
+  <!-- OWNER-ONLY LOGIN GATE (Protects MedPYQ & MBBS PROFS PREP Vaults)      -->
+  <!-- ===================================================================== -->
+  <div id="authOverlay" class="fixed inset-0 z-[70] bg-zinc-950/98 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+          <svg class="w-6 h-6 text-zinc-950" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-black tracking-wider text-white uppercase">APEX MENTOR</h1>
+          <p class="text-xs text-zinc-400">Owner-Only Vault &amp; PYQ Commander</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-zinc-400 mb-5 leading-relaxed">
+        Sign in with your <strong class="text-amber-300">MBBS PROFS PREP Admin</strong> email to unlock your AIIMS Prof PYQs, model answers, MedPYQ PG bridge, and synced bookmarks.
+      </p>
+
+      <form id="loginForm" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Admin Email</label>
+          <input id="loginEmail" type="email" required autocomplete="email" placeholder="pankajmahto109@gmail.com" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Password</label>
+          <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500" />
+        </div>
+        <p id="loginError" class="hidden text-xs font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-xl p-2.5"></p>
+        <button id="loginSubmitBtn" type="submit" class="w-full py-3 rounded-xl text-sm font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 shadow-lg transition active:scale-95">
+          Unlock Command Center
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TOP HUD BAR                                                           -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-30 hud-glass border-b border-zinc-800/90 px-3 sm:px-5 py-2.5">
+    <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-2.5">
+
+      <!-- Left: Brand + Cloud Sync + Exam Countdown -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+            <svg class="w-5 h-5 text-zinc-950" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-sm sm:text-base font-black tracking-wider text-white uppercase">APEX MENTOR</h1>
+              <span id="cloudSyncBadge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-900 border border-zinc-800 text-zinc-400">
+                <span id="cloudSyncDot" class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span id="cloudSyncText">Locked</span>
+              </span>
+            </div>
+            <p class="text-[11px] text-zinc-400 hidden sm:block">MBBS Profs + MedPYQ Connected</p>
+          </div>
+        </div>
+
+        <button id="examCountdownBtn" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition text-left active:scale-95" title="Edit target exam date">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400">PROFS</span>
+          <span id="examDaysLeft" class="font-mono text-xs sm:text-sm font-extrabold text-white tabular-nums">--d</span>
+          <span id="examTargetDateLabel" class="text-[10px] text-zinc-400 hidden md:inline">Dec 4, 2026</span>
+        </button>
+      </div>
+
+      <!-- Center: Level, XP Bar, Focus Mins, Streak -->
+      <div class="flex items-center gap-3 bg-zinc-900/90 border border-zinc-800 rounded-xl px-3 py-1.5">
+        <div class="flex items-center gap-2">
+          <span id="hudLevelBadge" class="px-2 py-0.5 rounded-lg text-[11px] font-black font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">LVL 1</span>
+          <div class="w-20 sm:w-28">
+            <div class="flex justify-between text-[10px] font-mono text-zinc-400 mb-0.5">
+              <span id="hudXpText">0 XP</span>
+              <span id="hudNextXpText">200</span>
+            </div>
+            <div class="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+              <div id="hudXpBar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="h-6 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-3 text-xs font-mono">
+          <span class="text-emerald-400 font-bold tabular-nums" id="hudFocusMins" title="Focus minutes today">0m</span>
+          <span class="text-amber-400 font-bold tabular-nums" id="hudStreak" title="Study streak">🔥 1d</span>
+        </div>
+      </div>
+
+      <!-- Right: Voice, Wake Lock, Test Alarm, Settings -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+          <button id="voiceToggleBtn" type="button" class="flex items-center gap-1.5 px-2.5 py-2 text-xs font-semibold text-zinc-300 hover:text-white transition" title="Toggle Voice Mentor">
+            <span id="voiceDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="hidden sm:inline">Voice</span>
+          </button>
+          <select id="voiceSpeedSelect" aria-label="Voice Speed" class="bg-zinc-950 text-amber-300 font-mono text-[11px] font-bold px-1.5 py-2 border-l border-zinc-800 focus:outline-none cursor-pointer">
+            <option value="1">1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="1.75" selected>1.75x</option>
+            <option value="2">2.0x</option>
+          </select>
+        </div>
+
+        <button id="wakeLockBtn" type="button" class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-semibold bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 transition active:scale-95" title="Keep screen awake">
+          <span id="wakeLockDot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
+          <span id="wakeLockLabel" class="hidden md:inline">Awake: Off</span>
+        </button>
+
+        <button id="testAlarmHudBtn" type="button" class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-bold bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 transition active:scale-95" title="Test escalating wake-up siren">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+
+        <button id="openSettingsBtn" type="button" class="px-2.5 py-2 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition active:scale-95" title="Gemini API Key & Vault Settings">
+          ⚙️
+        </button>
+      </div>
+    </div>
+
+    <!-- Active PYQ Vault Selector Strip -->
+    <div class="max-w-[1600px] mx-auto mt-2 flex flex-wrap items-center justify-between gap-2 bg-zinc-900/70 border border-zinc-800/80 rounded-xl px-3 py-1.5">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">PYQ Vault:</span>
+        <select id="vaultCollegeSelect" class="bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-amber-500">
+          <option value="deoghar" selected>AIIMS Deoghar</option>
+          <option value="delhi">AIIMS Delhi</option>
+          <option value="kalyani">AIIMS Kalyani</option>
+          <option value="patna">AIIMS Patna</option>
+        </select>
+        <select id="vaultSubjectSelect" class="bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1 text-xs font-semibold text-amber-300 focus:outline-none focus:border-amber-500">
+          <option value="OPHTHALMOLOGY|ophthalmology">Ophthalmology</option>
+          <option value="PSM|psm">CFM / PSM</option>
+          <option value="ENT|ent">ENT</option>
+          <option value="ORTHOPAEDICS|orthopaedics">Orthopedics</option>
+          <option value="PSYCHIATRY|psychiatry">Psychiatry</option>
+          <option value="MEDICINE|medicine">Medicine</option>
+          <option value="SURGERY|surgery">Surgery</option>
+          <option value="OBG|obg">OBG</option>
+          <option value="PAEDIATRICS|paediatrics">Paediatrics</option>
+          <option value="PATHOLOGY|pathology">Pathology</option>
+          <option value="PHARMACOLOGY|pharmacology">Pharmacology</option>
+          <option value="MICROBIOLOGY|microbiology">Microbiology</option>
+          <option value="FMT|fmt">FMT</option>
+        </select>
+        <button id="syncVaultBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition active:scale-95">
+          Sync PYQs
+        </button>
+      </div>
+      <div id="vaultStatusText" class="text-[11px] font-mono text-zinc-400">
+        Sign in to load Prof + MedPYQ banks
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-[1600px] mx-auto mt-2 flex items-center gap-1.5 overflow-x-auto pb-0.5">
+      <button type="button" data-tab="command" class="nav-tab shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-amber-500 text-zinc-950 shadow">
+        1. COMMAND
+      </button>
+      <button type="button" data-tab="mentor" class="nav-tab lg:hidden relative shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-zinc-900 text-zinc-400 border border-zinc-800 flex items-center gap-1.5">
+        <span>MENTOR</span>
+        <span id="mobileMentorBadge" class="hidden w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+      </button>
+      <button type="button" data-tab="syllabus" class="nav-tab shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800">
+        2. SYLLABUS &amp; PYQs
+      </button>
+      <button type="button" data-tab="mistakes" class="nav-tab shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 flex items-center gap-1.5">
+        <span>3. MISTAKE &amp; SRS</span>
+        <span id="mistakeCountBadge" class="px-1.5 rounded-md text-[10px] font-mono bg-rose-500/20 text-rose-300">0</span>
+      </button>
+      <button type="button" data-tab="analytics" class="nav-tab shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800">
+        4. ANALYTICS &amp; LOG
+      </button>
+    </div>
+  </header>
+
+  <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex flex-col gap-2 w-[92%] max-w-md pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN WORKSPACE                                                        -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 w-full max-w-[1600px] mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+    <!-- LEFT PANE (7 Cols) -->
+    <div id="workspacePane" class="lg:col-span-7 flex flex-col gap-5">
+
+      <!-- TAB 1: COMMAND -->
+      <section id="tab-command" class="tab-panel space-y-5">
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-widest text-amber-400">Active Tactical Order</span>
+              <h2 id="missionTopicTitle" class="text-lg sm:text-xl font-extrabold text-white mt-0.5">No Mission Assigned Yet</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95" title="Quiz 3 linked MedPYQ PG stems for current subject">
+                MedPYQ PG Bridge
+              </button>
+              <button id="prescribeMissionBtn" type="button" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 shadow-lg shadow-amber-500/20 transition active:scale-95">
+                ⚡ Prescribe Mission
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-zinc-950/90 border border-zinc-800/90 rounded-xl p-3.5 mb-4">
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Subject &amp; QID</div>
+              <div id="missionSubject" class="text-xs sm:text-sm font-bold text-amber-300 mt-0.5 truncate">—</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Assigned Block</div>
+              <div id="missionDurationLabel" class="text-xs sm:text-sm font-bold text-emerald-400 font-mono mt-0.5">45 mins</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Deliverable</div>
+              <div id="missionDeliverable" class="text-xs text-zinc-300 mt-0.5 line-clamp-2">Hit Prescribe or pick a chapter from Syllabus.</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <div id="step-assign" class="loop-step py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-bold border border-amber-500/50 bg-amber-500/15 text-amber-300">1. ASSIGN</div>
+            <div id="step-study" class="loop-step py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-bold border border-zinc-800 bg-zinc-950 text-zinc-500">2. STUDY</div>
+            <div id="step-test" class="loop-step py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-bold border border-zinc-800 bg-zinc-950 text-zinc-500">3. TEST</div>
+            <div id="step-correct" class="loop-step py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-bold border border-zinc-800 bg-zinc-950 text-zinc-500">4. CORRECT</div>
+          </div>
+        </div>
+
+        <!-- Timer Card -->
+        <div id="timerCard" class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Study Block Timer</span>
+              <span id="pauseWarningBadge" class="hidden px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">0 Pauses</span>
+            </div>
+            <span id="timerStatusBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">STANDBY</span>
+          </div>
+
+          <div class="grid grid-cols-5 gap-2 mb-5">
+            <button type="button" data-preset="25" class="preset-btn py-2.5 px-1.5 rounded-xl text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-amber-300 border border-zinc-800 transition active:scale-95">25m Cap</button>
+            <button type="button" data-preset="45" class="preset-btn py-2.5 px-1.5 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 transition active:scale-95">45m Pomo</button>
+            <button type="button" data-preset="90" class="preset-btn py-2.5 px-1.5 rounded-xl text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition active:scale-95">90m Deep</button>
+            <button type="button" data-preset="2" class="preset-btn py-2.5 px-1.5 rounded-xl text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-zinc-400 border border-zinc-800 transition active:scale-95">2m Test</button>
+            <input id="customMinInput" type="number" min="1" max="240" placeholder="Custom" class="w-full px-2 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-center font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500" />
+          </div>
+
+          <div class="relative bg-zinc-950 border border-zinc-800 rounded-2xl py-7 px-4 text-center mb-5 overflow-hidden">
+            <div class="absolute bottom-0 left-0 h-1.5 bg-zinc-900 w-full">
+              <div id="timerProgressBar" class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <div id="countdownDisplay" class="font-mono text-5xl sm:text-7xl font-extrabold tracking-tight tabular-nums text-white">45:00</div>
+            <p id="timerSubtext" class="mt-2 text-xs text-zinc-400 truncate px-2">Lock in your mission and press Start.</p>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <button id="startTimerBtn" type="button" class="py-3 px-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-lg shadow-emerald-500/20 transition active:scale-95">Start</button>
+            <button id="strictPauseBtn" type="button" disabled class="py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-zinc-800 hover:bg-rose-950/80 hover:text-rose-300 disabled:opacity-40 disabled:pointer-events-none text-zinc-200 border border-zinc-700 transition active:scale-95">Strict Pause</button>
+            <button id="resetTimerBtn" type="button" class="py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition active:scale-95">Reset</button>
+            <button id="finishAndTestBtn" type="button" class="py-3 px-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wide bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition active:scale-95">Finish &amp; Test</button>
+          </div>
+        </div>
+
+        <!-- Inertia Breaker + Wake-Up Alarm -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="bg-zinc-900/90 border border-rose-500/30 rounded-2xl p-5 flex flex-col justify-between gap-4">
+            <div>
+              <div class="text-rose-400 text-xs font-black uppercase tracking-widest">⚠️ Inertia Breaker</div>
+              <p class="text-xs text-zinc-400 mt-1.5">Scrolling or stuck? Trigger a blunt mentor order + 3-minute micro-ignition countdown.</p>
+            </div>
+            <button id="lazyEmergencyBtn" type="button" class="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-rose-600 hover:bg-rose-500 text-white shadow-lg transition active:scale-95">
+              I'm Feeling Lazy / Stuck
+            </button>
+          </div>
+
+          <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase tracking-widest text-amber-400">Wake-Up Alarm</span>
+              <span id="alarmArmedBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400">DISARMED</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="wakeUpTimeInput" type="time" value="04:30" class="flex-1 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-sm font-bold text-white focus:outline-none focus:border-amber-500" />
+              <button id="toggleAlarmBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition active:scale-95">Arm</button>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-zinc-400">
+              <span id="liveClockDisplay" class="font-mono">Now: --:--:--</span>
+              <button id="testAlarmCardBtn" type="button" class="text-rose-400 hover:text-rose-300 font-bold underline underline-offset-2">Test Siren Overlay</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: SYLLABUS & PYQ HEATMAP -->
+      <section id="tab-syllabus" class="tab-panel hidden space-y-4">
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="text-base font-extrabold text-white">Syllabus &amp; PYQ Repeat Matrix</h2>
+              <p class="text-xs text-zinc-400">Auto-synced from your <code class="text-amber-300">curriculumData</code> + Teen Patti repeat clusters</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="syllabusFilterSubject" class="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-amber-500">
+                <option value="ALL">All Subjects</option>
+              </select>
+              <select id="syllabusFilterStatus" class="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-amber-500">
+                <option value="ALL">All Statuses</option>
+                <option value="Weak">Weak</option>
+                <option value="Untouched">Untouched</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Mastered">Mastered</option>
+              </select>
+            </div>
+          </div>
+
+          <form id="addTopicForm" class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-5 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+            <input id="newTopicSubject" type="text" required placeholder="Subject" class="sm:col-span-3 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500" />
+            <input id="newTopicName" type="text" required placeholder="Chapter / High-yield topic..." class="sm:col-span-5 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500" />
+            <input id="newTopicMastery" type="number" min="0" max="100" value="20" placeholder="%" class="sm:col-span-2 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-white focus:outline-none focus:border-amber-500" />
+            <button type="submit" class="sm:col-span-2 py-2 px-3 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-zinc-950 transition active:scale-95">+ Add</button>
+          </form>
+
+          <div id="syllabusList" class="space-y-2.5 max-h-[540px] overflow-y-auto pr-1"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: MISTAKE BANK + SYNCED MBBS PROFS PREP BOOKMARKS (SRS) -->
+      <section id="tab-mistakes" class="tab-panel hidden space-y-5">
+        <!-- Due SRS Bookmarks from MBBS PROFS PREP -->
+        <div class="bg-zinc-900/90 border border-indigo-500/30 rounded-2xl p-5 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div>
+              <h2 class="text-sm font-extrabold text-indigo-300 uppercase tracking-wider">🔖 Due SRS Bookmarks (MBBS PROFS PREP)</h2>
+              <p class="text-xs text-zinc-400">2-way synced with <code class="text-zinc-300">users/{uid}/bookmarks</code></p>
+            </div>
+            <span id="dueBookmarksBadge" class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300">0 Due</span>
+          </div>
+          <div id="dueBookmarksList" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- Mistake Vault -->
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="text-base font-extrabold text-white">Mistake Bank / Error Vault</h2>
+              <p class="text-xs text-zinc-400">Auto-captured from AI Rubric Critiques</p>
+            </div>
+            <button id="drillMistakesBtn" type="button" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-600 hover:bg-rose-500 text-white shadow-lg transition active:scale-95">
+              ⚡ Drill My Mistakes
+            </button>
+          </div>
+
+          <form id="addMistakeForm" class="grid grid-cols-1 sm:grid-cols-12 gap-2 mb-5 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+            <input id="mistakeSubjectInput" type="text" required placeholder="Subject" class="sm:col-span-2 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-rose-500" />
+            <input id="mistakeWrongInput" type="text" required placeholder="What you got wrong..." class="sm:col-span-4 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-rose-500" />
+            <input id="mistakeCorrectInput" type="text" required placeholder="Correct high-yield fact..." class="sm:col-span-4 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500" />
+            <button type="submit" class="sm:col-span-2 py-2 px-3 rounded-lg text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 transition active:scale-95">+ Log</button>
+          </form>
+
+          <div id="mistakeList" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: ANALYTICS -->
+      <section id="tab-analytics" class="tab-panel hidden space-y-4">
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 class="text-base font-extrabold text-white">Daily Performance &amp; Study Log</h2>
+              <p class="text-xs text-zinc-400">Synced under <code class="text-zinc-300">admin_private/apex_mentor/logs</code></p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-zinc-400">Daily Goal:</span>
+              <input id="dailyGoalHoursInput" type="number" min="1" max="16" value="8" class="w-14 px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 font-mono text-center text-amber-300 font-bold focus:outline-none focus:border-amber-500" />
+              <span class="text-zinc-400">hrs</span>
+            </div>
+          </div>
+
+          <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 mb-5">
+            <div class="flex justify-between items-baseline mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Progress to Daily Target</span>
+              <span id="dailyGoalProgressText" class="font-mono text-sm font-extrabold text-emerald-400">0.0h / 8h (0%)</span>
+            </div>
+            <div class="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+              <div id="dailyGoalBar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5">
+              <div class="text-[10px] font-bold uppercase text-zinc-500">Focus Today</div>
+              <div id="kpiFocusHours" class="font-mono text-xl font-black text-emerald-400 mt-1">0.0h</div>
+            </div>
+            <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5">
+              <div class="text-[10px] font-bold uppercase text-zinc-500">Blocks Done</div>
+              <div id="kpiBlocksDone" class="font-mono text-xl font-black text-white mt-1">0</div>
+            </div>
+            <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5">
+              <div class="text-[10px] font-bold uppercase text-zinc-500">Avg Critique</div>
+              <div id="kpiAvgScore" class="font-mono text-xl font-black text-amber-400 mt-1">—/10</div>
+            </div>
+            <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5">
+              <div class="text-[10px] font-bold uppercase text-zinc-500">XP Today</div>
+              <div id="kpiXpToday" class="font-mono text-xl font-black text-indigo-400 mt-1">+0</div>
+            </div>
+          </div>
+
+          <div id="analyticsLogList" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT PANE: MENTOR CHAT (5 Cols) -->
+    <section id="mentorPane" class="hidden lg:flex lg:col-span-5 flex-col bg-zinc-900/95 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden h-[calc(100vh-13.5rem)] lg:h-[calc(100vh-11rem)] min-h-[500px] sticky top-[10rem]">
+      <div class="px-4 py-3 border-b border-zinc-800 bg-zinc-950/80 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="relative">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/20 to-rose-500/20 border border-amber-500/40 flex items-center justify-center font-mono font-black text-amber-300 text-xs">CMD</div>
+            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-zinc-950"></span>
+          </div>
+          <div>
+            <h2 class="text-sm font-extrabold text-white leading-tight">APEX AI Commander</h2>
+            <p id="mentorLoopStatusText" class="text-[11px] text-amber-400 font-semibold">Mode: Ready to Assign Mission</p>
+          </div>
+        </div>
+        <button id="stopSpeechBtn" type="button" class="hidden px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">Mute Audio</button>
+      </div>
+
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3.5 scroll-smooth"></div>
+
+      <div class="p-3 border-t border-zinc-800 bg-zinc-950/90">
+        <div class="flex flex-wrap gap-1.5 mb-2.5">
+          <button type="button" data-quick="Give me a 10-mark Prof answer skeleton (headings + diagram + viva traps) for my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">10-Mark Skeleton</button>
+          <button type="button" data-quick="Test me with 3 rapid-fire high-yield PYQs on my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-rose-500/20 hover:text-rose-300 text-zinc-300 border border-zinc-800 transition">Quiz Me Now</button>
+          <button type="button" data-quick="I finished my block. Here is my recall dump:" class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-emerald-500/20 hover:text-emerald-300 text-zinc-300 border border-zinc-800 transition">Submit Recall</button>
+        </div>
+
+        <form id="chatForm" class="flex items-end gap-2">
+          <button id="micBtn" type="button" class="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-amber-400 transition active:scale-95 shrink-0" title="Vocal Recall Drill (Speech-to-Text)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          </button>
+          <textarea id="chatInput" rows="1" placeholder="Answer your mentor, dump recall points, or speak..." class="flex-1 resize-none px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 max-h-32 transition"></textarea>
+          <button id="sendChatBtn" type="submit" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 font-black text-sm transition active:scale-95 shrink-0">Send</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- SETTINGS MODAL (Gemini API Key + Model + Sign Out)                    -->
+  <!-- ===================================================================== -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-md shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">⚙️ APEX Commander Settings</h3>
+        <button id="closeSettingsBtn" type="button" class="text-zinc-400 hover:text-white text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Gemini API Key (Synced to admin_private)</label>
+          <input id="settingsGeminiKey" type="password" placeholder="AIzaSy..." class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-mono text-white focus:outline-none focus:border-amber-500" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Gemini Model</label>
+          <select id="settingsGeminiModel" class="w-full px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-mono text-amber-300 focus:outline-none focus:border-amber-500">
+            <option value="gemini-2.5-flash">gemini-2.5-flash (Recommended)</option>
+            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Fastest / Cheapest)</option>
+            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-zinc-800">
+        <button id="logoutBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30">Sign Out</button>
+        <div class="flex gap-2">
+          <button id="clearCacheBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-300">Clear PYQ Cache</button>
+          <button id="saveSettingsBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-zinc-950">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT EXAM DATE -->
+  <div id="examDateModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+      <h3 class="text-base font-extrabold text-white mb-1">Set Target Exam Date</h3>
+      <p class="text-xs text-zinc-400 mb-4">Updates your HUD countdown and syncs to RTDB.</p>
+      <input id="examDatePicker" type="date" value="2026-12-04" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm font-mono text-white focus:outline-none focus:border-amber-500 mb-4" />
+      <div class="flex justify-end gap-2">
+        <button id="cancelExamDateBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300">Cancel</button>
+        <button id="saveExamDateBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-black bg-amber-500 text-zinc-950">Save Date</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: 3-MIN MICRO-IGNITION -->
+  <div id="ignitionModal" class="hidden fixed inset-0 z-50 bg-zinc-950/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border-2 border-amber-500/60 rounded-2xl p-6 w-full max-w-md text-center shadow-2xl animate-pulse-amber">
+      <span class="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/40">Micro-Ignition Protocol</span>
+      <h3 class="text-xl font-black text-white mt-3">BREAK INERTIA RIGHT NOW</h3>
+      <p id="ignitionOrderText" class="text-xs sm:text-sm text-zinc-300 mt-2 leading-relaxed">Open your notes and write 3 headings before this timer hits zero.</p>
+      <div id="ignitionClock" class="font-mono text-6xl font-black text-amber-400 my-5 tabular-nums">03:00</div>
+      <div class="flex gap-2.5 justify-center">
+        <button id="ignitionStartFullBtn" type="button" class="px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-zinc-950 transition">I'm Locked In → Start Block</button>
+        <button id="closeIgnitionBtn" type="button" class="px-4 py-3 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY: WAKE-UP ALARM -->
+  <div id="wakeUpOverlay" class="hidden fixed inset-0 z-[60] bg-rose-950/95 backdrop-blur-lg flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border-2 border-rose-500 rounded-3xl p-6 sm:p-8 w-full max-w-lg text-center shadow-2xl animate-pulse-crimson">
+      <h2 class="text-2xl sm:text-3xl font-black text-white uppercase">WAKE UP. NO EXCUSES.</h2>
+      <p class="text-sm text-rose-200 mt-2">Type the exact commitment phrase below to silence the siren:</p>
+      <div class="my-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 font-mono text-sm sm:text-base font-extrabold text-amber-300 select-none">I am awake and starting now</div>
+      <form id="dismissAlarmForm" class="space-y-3">
+        <input id="alarmPhraseInput" type="text" autocomplete="off" placeholder="Type the exact phrase above..." class="w-full px-4 py-3.5 rounded-xl bg-zinc-900 border border-rose-500/60 text-center text-sm font-mono text-white focus:outline-none focus:border-amber-400" />
+        <p id="alarmPhraseError" class="hidden text-xs font-bold text-rose-400">Exact match required.</p>
+        <button type="submit" class="w-full py-3.5 rounded-xl text-sm font-black uppercase tracking-wider bg-rose-600 hover:bg-rose-500 text-white shadow-lg">Silence Siren &amp; Claim +15 XP</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION LOGIC (Firebase v11 RTDB + IndexedDB PYQ Cache + Gemini)  -->
+  <!-- ===================================================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    const PROFS_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDvPdEhkK1VDkuAqIhlSXPL2MXxlv7Mo9c",
+      authDomain: "mbbs-profs-prep48c.firebaseapp.com",
+      databaseURL: "https://mbbs-profs-prep48c-default-rtdb.firebaseio.com",
+      projectId: "mbbs-profs-prep48c",
+      storageBucket: "mbbs-profs-prep48c.firebasestorage.app",
+      messagingSenderId: "378639777472",
+      appId: "1:378639777472:web:9c2dcb689d97025f6ff725"
+    };
+
+    const ADMIN_EMAILS = [
+      "pankajmahto109@gmail.com",
+      "educateindiainstitute@gmail.com",
+      "pankajkumarmahto1009@gmail.com"
+    ];
+
+    const COMMITMENT_PHRASE = "I am awake and starting now";
+    const IDB_NAME = "ApexMentorPYQCache_v1";
+    const IDB_STORE = "vaults";
+
+    const app = initializeApp(PROFS_FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // =========================================================================
+    // 1. STATE
+    // =========================================================================
+    const state = {
+      user: null,
+      geminiKey: localStorage.getItem("apex_gemini_key") || "",
+      geminiModel: localStorage.getItem("apex_gemini_model") || "gemini-2.5-flash",
+      vault: {
+        college: "deoghar",
+        subjectKey: "OPHTHALMOLOGY",
+        bridgeSlug: "ophthalmology",
+        qnaData: [],
+        curriculumData: [],
+        repeatMap: {},
+        pgCache: {},
+        loaded: false
+      },
+      bookmarks: {},
+      profile: {
+        xp: 0, level: 1, streak: 1, examDate: "2026-12-04",
+        dailyGoalHours: 8, wakeUpTime: "04:30", alarmArmed: false
+      },
+      activeMission: {
+        id: null, qid: "", subject: "Ophthalmology", topic: "Select or Prescribe a Mission",
+        durationMinutes: 45, deliverable: "Sync PYQs and hit Prescribe Mission.", stage: "ASSIGN"
+      },
+      timer: { durationMinutes: 45, remainingSeconds: 2700, isRunning: false, endTimeMs: null, intervalId: null, pauseCount: 0 },
+      syllabus: [],
+      mistakes: [],
+      logs: [],
+      chatHistory: [],
+      lastTestQuestions: "",
+      lastTestQid: "",
+      lastCritiqueScore: null,
+      isAiBusy: false,
+      voiceEnabled: true,
+      voiceSpeed: 1.75,
+      wakeLockEnabled: false,
+      wakeLockSentinel: null,
+      activeTab: "command",
+      alarmRinging: false,
+      alarmTriggeredMinute: null,
+      ignitionIntervalId: null
+    };
+
+    // =========================================================================
+    // 2. DOM REFS
+    // =========================================================================
+    const $ = (id) => document.getElementById(id);
+    const el = {
+      authOverlay: $("authOverlay"), loginForm: $("loginForm"), loginEmail: $("loginEmail"),
+      loginPassword: $("loginPassword"), loginError: $("loginError"), loginSubmitBtn: $("loginSubmitBtn"),
+      cloudSyncDot: $("cloudSyncDot"), cloudSyncText: $("cloudSyncText"),
+      examCountdownBtn: $("examCountdownBtn"), examDaysLeft: $("examDaysLeft"), examTargetDateLabel: $("examTargetDateLabel"),
+      hudLevelBadge: $("hudLevelBadge"), hudXpText: $("hudXpText"), hudNextXpText: $("hudNextXpText"),
+      hudXpBar: $("hudXpBar"), hudFocusMins: $("hudFocusMins"), hudStreak: $("hudStreak"),
+      voiceToggleBtn: $("voiceToggleBtn"), voiceDot: $("voiceDot"), voiceSpeedSelect: $("voiceSpeedSelect"),
+      wakeLockBtn: $("wakeLockBtn"), wakeLockDot: $("wakeLockDot"), wakeLockLabel: $("wakeLockLabel"),
+      testAlarmHudBtn: $("testAlarmHudBtn"), openSettingsBtn: $("openSettingsBtn"),
+      vaultCollegeSelect: $("vaultCollegeSelect"), vaultSubjectSelect: $("vaultSubjectSelect"),
+      syncVaultBtn: $("syncVaultBtn"), vaultStatusText: $("vaultStatusText"),
+      navTabs: document.querySelectorAll(".nav-tab"), tabPanels: document.querySelectorAll(".tab-panel"),
+      workspacePane: $("workspacePane"), mentorPane: $("mentorPane"),
+      mobileMentorBadge: $("mobileMentorBadge"), mistakeCountBadge: $("mistakeCountBadge"),
+      missionTopicTitle: $("missionTopicTitle"), missionSubject: $("missionSubject"),
+      missionDurationLabel: $("missionDurationLabel"), missionDeliverable: $("missionDeliverable"),
+      prescribeMissionBtn: $("prescribeMissionBtn"), bridgePgQuizBtn: $("bridgePgQuizBtn"),
+      timerStatusBadge: $("timerStatusBadge"), pauseWarningBadge: $("pauseWarningBadge"),
+      presetBtns: document.querySelectorAll(".preset-btn"), customMinInput: $("customMinInput"),
+      countdownDisplay: $("countdownDisplay"), timerProgressBar: $("timerProgressBar"),
+      timerSubtext: $("timerSubtext"), startTimerBtn: $("startTimerBtn"),
+      strictPauseBtn: $("strictPauseBtn"), resetTimerBtn: $("resetTimerBtn"), finishAndTestBtn: $("finishAndTestBtn"),
+      lazyEmergencyBtn: $("lazyEmergencyBtn"), wakeUpTimeInput: $("wakeUpTimeInput"),
+      toggleAlarmBtn: $("toggleAlarmBtn"), alarmArmedBadge: $("alarmArmedBadge"),
+      liveClockDisplay: $("liveClockDisplay"), testAlarmCardBtn: $("testAlarmCardBtn"),
+      syllabusFilterSubject: $("syllabusFilterSubject"), syllabusFilterStatus: $("syllabusFilterStatus"),
+      addTopicForm: $("addTopicForm"), newTopicSubject: $("newTopicSubject"),
+      newTopicName: $("newTopicName"), newTopicMastery: $("newTopicMastery"), syllabusList: $("syllabusList"),
+      dueBookmarksBadge: $("dueBookmarksBadge"), dueBookmarksList: $("dueBookmarksList"),
+      drillMistakesBtn: $("drillMistakesBtn"), addMistakeForm: $("addMistakeForm"),
+      mistakeSubjectInput: $("mistakeSubjectInput"), mistakeWrongInput: $("mistakeWrongInput"),
+      mistakeCorrectInput: $("mistakeCorrectInput"), mistakeList: $("mistakeList"),
+      dailyGoalHoursInput: $("dailyGoalHoursInput"), dailyGoalProgressText: $("dailyGoalProgressText"),
+      dailyGoalBar: $("dailyGoalBar"), kpiFocusHours: $("kpiFocusHours"),
+      kpiBlocksDone: $("kpiBlocksDone"), kpiAvgScore: $("kpiAvgScore"), kpiXpToday: $("kpiXpToday"),
+      analyticsLogList: $("analyticsLogList"), mentorLoopStatusText: $("mentorLoopStatusText"),
+      stopSpeechBtn: $("stopSpeechBtn"), chatMessages: $("chatMessages"), chatForm: $("chatForm"),
+      chatInput: $("chatInput"), sendChatBtn: $("sendChatBtn"), micBtn: $("micBtn"),
+      quickChips: document.querySelectorAll(".quick-chip"),
+      settingsModal: $("settingsModal"), closeSettingsBtn: $("closeSettingsBtn"),
+      settingsGeminiKey: $("settingsGeminiKey"), settingsGeminiModel: $("settingsGeminiModel"),
+      saveSettingsBtn: $("saveSettingsBtn"), clearCacheBtn: $("clearCacheBtn"), logoutBtn: $("logoutBtn"),
+      examDateModal: $("examDateModal"), examDatePicker: $("examDatePicker"),
+      cancelExamDateBtn: $("cancelExamDateBtn"), saveExamDateBtn: $("saveExamDateBtn"),
+      ignitionModal: $("ignitionModal"), ignitionOrderText: $("ignitionOrderText"),
+      ignitionClock: $("ignitionClock"), ignitionStartFullBtn: $("ignitionStartFullBtn"), closeIgnitionBtn: $("closeIgnitionBtn"),
+      wakeUpOverlay: $("wakeUpOverlay"), dismissAlarmForm: $("dismissAlarmForm"),
+      alarmPhraseInput: $("alarmPhraseInput"), alarmPhraseError: $("alarmPhraseError"),
+      toastContainer: $("toastContainer")
+    };
+
+    // =========================================================================
+    // 3. HELPERS & INDEXEDDB CACHE (Near-₹0 Blaze Egress)
+    // =========================================================================
+    function openIDB() {
+      return new Promise((resolve) => {
+        if (!window.indexedDB) return resolve(null);
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          if (!e.target.result.objectStoreNames.contains(IDB_STORE)) e.target.result.createObjectStore(IDB_STORE);
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = () => resolve(null);
+      });
+    }
+    async function idbGet(key) {
+      const idb = await openIDB();
+      if (!idb) return null;
+      return new Promise((res) => {
+        const r = idb.transaction(IDB_STORE, "readonly").objectStore(IDB_STORE).get(key);
+        r.onsuccess = () => res(r.result || null);
+        r.onerror = () => res(null);
+      });
+    }
+    async function idbSet(key, val) {
+      const idb = await openIDB();
+      if (!idb) return;
+      return new Promise((res) => {
+        const tx = idb.transaction(IDB_STORE, "readwrite");
+        tx.objectStore(IDB_STORE).put(val, key);
+        tx.oncomplete = res; tx.onerror = res;
+      });
+    }
+    async function idbClear() {
+      const idb = await openIDB();
+      if (!idb) return;
+      return new Promise((res) => {
+        const tx = idb.transaction(IDB_STORE, "readwrite");
+        tx.objectStore(IDB_STORE).clear();
+        tx.oncomplete = res; tx.onerror = res;
+      });
+    }
+
+    const getTodayDateStr = () => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+    const formatTime = (sec) => {
+      const s = Math.max(0, Math.floor(sec));
+      return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    };
+    const formatClock = (d = new Date()) => d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const escapeHtml = (str) => String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const stripHtml = (s) => String(s || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const formatMarkdown = (text) => escapeHtml(text)
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+      .replace(/^[\-\*]\s+(.*)$/gm, '<div class="flex gap-1.5 mt-1"><span class="text-amber-400">▸</span><span>$1</span></div>')
+      .replace(/\n/g, "<br />");
+    const computeStatus = (m) => (m <= 15 ? "Untouched" : m < 45 ? "Weak" : m < 80 ? "In Progress" : "Mastered");
+
+    function safeParseJSON(raw) {
+      const cleaned = String(raw || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/```$/i, "").trim();
+      return JSON.parse(cleaned);
+    }
+
+    function showToast(msg, type = "info") {
+      const styles = {
+        info: "bg-zinc-900 border-zinc-700 text-zinc-100",
+        success: "bg-emerald-950/95 border-emerald-500/50 text-emerald-200",
+        warning: "bg-amber-950/95 border-amber-500/50 text-amber-200",
+        error: "bg-rose-950/95 border-rose-500/50 text-rose-200"
+      };
+      const div = document.createElement("div");
+      div.className = `pointer-events-auto px-4 py-3 rounded-xl border text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 opacity-0 translate-y-2 ${styles[type] || styles.info}`;
+      div.textContent = msg;
+      el.toastContainer.appendChild(div);
+      requestAnimationFrame(() => div.classList.remove("opacity-0", "translate-y-2"));
+      setTimeout(() => { div.classList.add("opacity-0", "translate-y-2"); setTimeout(() => div.remove(), 300); }, 3500);
+    }
+
+    // =========================================================================
+    // 4. OWNER-ONLY AUTH + RTDB SYNC (admin_private/apex_mentor)
+    // =========================================================================
+    function setCloudBadge(status, label) {
+      const dots = {
+        synced: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+        connecting: "bg-amber-400 animate-pulse",
+        offline: "bg-rose-500"
+      };
+      el.cloudSyncDot.className = `w-1.5 h-1.5 rounded-full ${dots[status] || dots.offline}`;
+      el.cloudSyncText.textContent = label;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || !ADMIN_EMAILS.includes((user.email || "").toLowerCase().trim())) {
+        if (user) await signOut(auth);
+        state.user = null;
+        el.authOverlay.classList.remove("hidden");
+        setCloudBadge("offline", "Locked");
+        return;
+      }
+
+      state.user = user;
+      el.authOverlay.classList.add("hidden");
+      setCloudBadge("connecting", "Syncing...");
+
+      await loadMentorStateFromRTDB();
+      await loadUserBookmarks();
+      await loadActiveSubjectVault(false);
+      setCloudBadge("synced", "Vault Live");
+
+      if (!state.geminiKey) {
+        showToast("Add your Gemini API key in ⚙️ Settings to activate AI Commander.", "warning");
+      }
+    });
+
+    async function loadMentorStateFromRTDB() {
+      const snap = await get(ref(db, "admin_private/apex_mentor")).catch(() => null);
+      const data = snap?.val() || {};
+
+      if (data.config?.geminiKey) {
+        state.geminiKey = data.config.geminiKey;
+        localStorage.setItem("apex_gemini_key", state.geminiKey);
+      }
+      if (data.config?.geminiModel) {
+        state.geminiModel = data.config.geminiModel;
+        localStorage.setItem("apex_gemini_model", state.geminiModel);
+      }
+      if (data.profile) state.profile = { ...state.profile, ...data.profile };
+      if (data.activeMission) state.activeMission = { ...state.activeMission, ...data.activeMission };
+
+      state.syllabus = data.syllabus ? Object.entries(data.syllabus).map(([id, v]) => ({ id, ...v })) : [];
+      state.mistakes = data.mistakes ? Object.entries(data.mistakes).map(([id, v]) => ({ id, ...v })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) : [];
+      state.logs = data.logs ? Object.entries(data.logs).map(([id, v]) => ({ id, ...v })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) : [];
+
+      renderAllUI();
+    }
+
+    async function saveProfileToRTDB() {
+      renderHUD(); renderMissionCard();
+      if (!state.user) return;
+      await update(ref(db, "admin_private/apex_mentor"), {
+        profile: state.profile,
+        activeMission: state.activeMission,
+        updatedAt: Date.now()
+      }).catch(() => {});
+    }
+
+    async function loadUserBookmarks() {
+      if (!state.user) return;
+      const snap = await get(ref(db, `users/${state.user.uid}/bookmarks`)).catch(() => null);
+      state.bookmarks = snap?.val() || {};
+      renderDueBookmarks();
+    }
+
+    // =========================================================================
+    // 5. MBBS PROFS PREP + MEDPYQ VAULT LOADER (Version-Gated IndexedDB)
+    // =========================================================================
+    async function loadActiveSubjectVault(forceRefresh = false) {
+      if (!state.user) return;
+      const college = el.vaultCollegeSelect.value;
+      const [subjectKey, bridgeSlug] = el.vaultSubjectSelect.value.split("|");
+      state.vault.college = college;
+      state.vault.subjectKey = subjectKey;
+      state.vault.bridgeSlug = bridgeSlug;
+
+      el.vaultStatusText.textContent = `Loading ${college.toUpperCase()} / ${subjectKey}...`;
+
+      try {
+        const metaSnap = await get(ref(db, `bank_meta/${college}/${subjectKey}/version`)).catch(() => null);
+        const remoteVer = Number(metaSnap?.val() || 1);
+        const cacheKey = `vault_${college}_${subjectKey}`;
+        let cached = !forceRefresh ? await idbGet(cacheKey) : null;
+
+        let bank = null, cross = null;
+        if (cached && cached.ver === remoteVer) {
+          bank = cached.bank;
+          cross = cached.cross;
+        } else {
+          const [bSnap, cSnap] = await Promise.all([
+            get(ref(db, `question_banks/${college}/${subjectKey}`)).catch(() => null),
+            get(ref(db, `cross_links/${bridgeSlug}`)).catch(() => null)
+          ]);
+          bank = bSnap?.val() || {};
+          cross = cSnap?.val() || {};
+          await idbSet(cacheKey, { ver: remoteVer, bank, cross });
+        }
+
+        const qnaData = Array.isArray(bank.qnaData) ? bank.qnaData : Object.values(bank.qnaData || {});
+        const curriculumData = Array.isArray(bank.curriculumData) ? bank.curriculumData : Object.values(bank.curriculumData || {});
+
+        // Compute repeat frequency from Teen Patti clusters
+        const repeatMap = {};
+        Object.values(cross.clusters || {}).forEach(cl => {
+          const members = Array.isArray(cl.qids) ? cl.qids : Object.keys(cl.nodes || {});
+          members.forEach(id => { repeatMap[String(id).toUpperCase()] = Math.max(repeatMap[String(id).toUpperCase()] || 1, members.length); });
+        });
+
+        state.vault = {
+          ...state.vault,
+          qnaData, curriculumData, repeatMap,
+          pgCache: cross.shared_q_cache || {},
+          loaded: true
+        };
+
+        // Auto-merge chapters from curriculumData into Syllabus Matrix
+        await mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData, repeatMap);
+
+        const pgCount = Object.keys(state.vault.pgCache).length;
+        el.vaultStatusText.textContent = `✓ ${qnaData.length} Prof PYQs • ${pgCount} Linked MedPYQ PG Stems`;
+        showToast(`Loaded ${qnaData.length} Prof PYQs (${subjectKey})`, "success");
+      } catch (err) {
+        el.vaultStatusText.textContent = `Error loading ${subjectKey}`;
+        showToast(`Vault load failed: ${err.message}`, "error");
+      }
+    }
+
+    async function mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData, repeatMap) {
+      const chapters = [];
+      curriculumData.forEach(item => {
+        if (typeof item === "string") chapters.push(item);
+        else if (item && Array.isArray(item.chapters)) item.chapters.forEach(c => chapters.push(String(c)));
+      });
+      if (!chapters.length) return;
+
+      const updates = {};
+      chapters.forEach(ch => {
+        const slug = `${subjectKey}_${ch}`.replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 64);
+        const matchingQs = qnaData.filter(q => JSON.stringify(q.chapter || "").toLowerCase().includes(ch.toLowerCase()));
+        const maxRepeat = matchingQs.reduce((mx, q) => Math.max(mx, repeatMap[String(q.q).toUpperCase()] || 1), 1);
+
+        const existing = state.syllabus.find(s => s.id === slug);
+        if (!existing) {
+          const obj = { subject: subjectKey, topic: ch, mastery: 15, status: "Untouched", pyqCount: matchingQs.length, maxRepeat, createdAt: Date.now() };
+          state.syllabus.push({ id: slug, ...obj });
+          updates[`admin_private/apex_mentor/syllabus/${slug}`] = obj;
+        } else {
+          existing.pyqCount = matchingQs.length;
+          existing.maxRepeat = maxRepeat;
+        }
+      });
+
+      if (Object.keys(updates).length && state.user) {
+        await update(ref(db), updates).catch(() => {});
+      }
+      state.syllabus.sort((a, b) => (a.mastery || 0) - (b.mastery || 0));
+      renderSyllabus();
+    }
+
+    function buildSubjectPYQPromptContext(chapterFilter = "") {
+      const { subjectKey, qnaData, repeatMap, pgCache } = state.vault;
+      if (!qnaData.length) return "No PYQ bank loaded yet.";
+
+      const filtered = qnaData
+        .filter(q => !chapterFilter || JSON.stringify(q.chapter || "").toLowerCase().includes(chapterFilter.toLowerCase()))
+        .map(q => ({
+          id: q.q,
+          type: q.type || "Theory",
+          repeats: repeatMap[String(q.q).toUpperCase()] || 1,
+          batch: Array.isArray(q.examBatch) ? q.examBatch.join("/") : (q.examBatch || ""),
+          stem: stripHtml(q.stem).slice(0, 180),
+          key: q.ans_key || ""
+        }))
+        .sort((a, b) => b.repeats - a.repeats);
+
+      const topTheory = filtered.filter(x => x.type !== "MCQ").slice(0, 12);
+      const topMcq = filtered.filter(x => x.type === "MCQ").slice(0, 8);
+      const topPG = Object.entries(pgCache).slice(0, 5).map(([qid, obj]) =>
+        `- [${qid} | ${obj.exam || "MedPYQ"} | Key:${obj.ans_key || ""}] ${stripHtml(obj.stem).slice(0, 160)}`
+      );
+
+      return [
+        `PROF THEORY PYQs (${subjectKey}${chapterFilter ? " - " + chapterFilter : ""}):`,
+        ...topTheory.map(q => `- [${q.id} | ${q.repeats}x | ${q.batch}] ${q.stem}`),
+        `PROF MCQs:`,
+        ...topMcq.map(q => `- [${q.id} | Key:${q.key}] ${q.stem}`),
+        topPG.length ? `LINKED MEDPYQ PG STEMS:\n${topPG.join("\n")}` : ""
+      ].join("\n");
+    }
+
+    async function fetchGroundTruthAnswer(qId) {
+      if (!qId) return "";
+      const { college, subjectKey } = state.vault;
+      const snap = await get(ref(db, `answers/${college}/${subjectKey}/${qId}/text`)).catch(() => null);
+      return snap?.exists() ? stripHtml(snap.val()).slice(0, 2200) : "";
+    }
+
+    // =========================================================================
+    // 6. GEMINI API CLIENT
+    // =========================================================================
+    async function callGemini(payload, maxRetries = 2) {
+      if (!state.geminiKey) {
+        el.settingsModal.classList.remove("hidden");
+        throw new Error("Missing Gemini API key. Enter it in Settings.");
+      }
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${state.geminiModel}:generateContent?key=${encodeURIComponent(state.geminiKey)}`;
+      let delay = 900;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          if ((res.status === 429 || res.status >= 500) && attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 2;
+            continue;
+          }
+          throw new Error(`Gemini HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) throw new Error("Empty Gemini response");
+        return text;
+      }
+    }
+
+    function buildCommanderContext() {
+      const today = getTodayDateStr();
+      const todayLogs = state.logs.filter(l => l.date === today);
+      const focusMinsToday = todayLogs.reduce((s, l) => s + (l.duration || 0), 0);
+      const weakTopics = state.syllabus
+        .filter(t => t.subject === state.vault.subjectKey && (t.mastery || 0) < 50)
+        .slice(0, 6)
+        .map(t => `${t.topic} (${t.mastery}%, ${t.pyqCount || 0} PYQs, ${t.maxRepeat || 1}x repeat)`)
+        .join("; ") || "None";
+
+      return `You are APEX MENTOR — a direct, high-standards tactical study commander for a 3rd-year MBBS student preparing for Profs (Target: ${state.profile.examDate}) and INI-CET/NEET-PG.
+CURRENT STATE:
+- Active Vault: ${state.vault.college.toUpperCase()} / ${state.vault.subjectKey}
+- Active Mission: [${state.activeMission.subject}] ${state.activeMission.topic} (QID: ${state.activeMission.qid || "General"}) | Stage: ${state.activeMission.stage}
+- Today's Focus: ${focusMinsToday} mins (${todayLogs.length} blocks) | Level ${state.profile.level}
+- Weakest Chapters in ${state.vault.subjectKey}: ${weakTopics}
+
+EXACT PYQ VAULT CONTEXT:
+${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : state.activeMission.topic)}`;
+    }
+
+    // =========================================================================
+    // 7. 4-STEP PROGRESSIVE MENTOR LOOP
+    // =========================================================================
+    async function prescribeNextMission() {
+      if (state.isAiBusy) return;
+      ensureAudioCtx();
+      setAiBusy(true);
+      el.prescribeMissionBtn.disabled = true;
+
+      try {
+        const raw = await callGemini({
+          contents: [{ role: "user", parts: [{ text: "Inspect my weakest chapters and highest-repeat Prof PYQs in the vault context. Prescribe ONE direct study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                subject: { type: "STRING" },
+                topic: { type: "STRING" },
+                qid: { type: "STRING" },
+                durationMinutes: { type: "INTEGER" },
+                deliverable: { type: "STRING" },
+                commanderOrder: { type: "STRING" }
+              },
+              required: ["subject", "topic", "durationMinutes", "deliverable", "commanderOrder"]
+            }
+          }
+        });
+        const order = safeParseJSON(raw);
+        const dur = Math.max(15, Math.min(90, order.durationMinutes || 45));
+        state.activeMission = {
+          id: Date.now().toString(),
+          qid: order.qid || "",
+          subject: order.subject || state.vault.subjectKey,
+          topic: order.topic,
+          durationMinutes: dur,
+          deliverable: order.deliverable,
+          stage: "STUDY"
+        };
+        setTimerDuration(dur);
+        await saveProfileToRTDB();
+        appendChat("model", `**MISSION ASSIGNED: ${state.activeMission.subject} — ${order.topic}** ${order.qid ? `(${order.qid})` : ""}\n${order.commanderOrder}\n\n**Deliverable:** ${order.deliverable}`, "ORDER");
+        speakMentor(`Mission assigned. ${order.topic} for ${dur} minutes. ${order.commanderOrder}`);
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        setAiBusy(false);
+        el.prescribeMissionBtn.disabled = false;
+      }
+    }
+
+    async function triggerTestPhase() {
+      stopTimerInterval();
+      state.timer.isRunning = false;
+      updateTimerUI();
+      playTacticalChime();
+      state.activeMission.stage = "TEST";
+      state.lastTestQid = state.activeMission.qid || "";
+      await saveProfileToRTDB();
+
+      if (window.innerWidth < 1024) { el.mobileMentorBadge.classList.remove("hidden"); switchTab("mentor"); }
+      setAiBusy(true);
+      try {
+        const questions = await callGemini({
+          contents: [{ role: "user", parts: [{ text: `I finished my block on ${state.activeMission.subject} — ${state.activeMission.topic}. Pull 3 sharp, high-yield recall questions directly from my Prof PYQ vault context above (include their QIDs). Keep it concise.` }] }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] }
+        });
+        state.lastTestQuestions = questions;
+        appendChat("model", `**TIME'S UP — PYQ RECALL TEST (${state.activeMission.topic})**\n${questions}\n\nReply with your recall dump (or tap the mic). I will grade against your vault's model answer.`, "TEST");
+        speakMentor(`Time is up on ${state.activeMission.topic}. Answer these 3 PYQ recall questions now.`);
+      } catch (err) {
+        appendChat("model", `**TIME'S UP on ${state.activeMission.topic}.** Dump the key headings, diagrams, and management steps you just studied.`, "TEST");
+      } finally {
+        setAiBusy(false);
+        el.chatInput.focus();
+      }
+    }
+
+    async function evaluateTestAnswer(userAnswer) {
+      setAiBusy(true);
+      try {
+        const groundTruth = await fetchGroundTruthAnswer(state.lastTestQid);
+        const rubricBlock = groundTruth ? `\nGROUND-TRUTH MODEL ANSWER FROM VAULT (${state.lastTestQid}):\n${groundTruth}\n` : "";
+
+        const raw = await callGemini({
+          contents: [{
+            role: "user",
+            parts: [{ text: `Mission: ${state.activeMission.subject} - ${state.activeMission.topic}\nQuestions:\n${state.lastTestQuestions}${rubricBlock}\nStudent's Answer:\n${userAnswer}\n\nGrade strictly out of 10 on must-write Prof headings, clinical points, and accuracy. Extract concrete mistakes into extractedMistakes.` }]
+          }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                score: { type: "INTEGER" },
+                verdict: { type: "STRING" },
+                errors: { type: "ARRAY", items: { type: "STRING" } },
+                extractedMistakes: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: { subject: { type: "STRING" }, wrong: { type: "STRING" }, correct: { type: "STRING" } },
+                    required: ["subject", "wrong", "correct"]
+                  }
+                },
+                correctionPrompt: { type: "STRING" }
+              },
+              required: ["score", "verdict", "errors", "extractedMistakes", "correctionPrompt"]
+            }
+          }
+        });
+
+        const critique = safeParseJSON(raw);
+        const score = Math.max(0, Math.min(10, critique.score ?? 5));
+        state.lastCritiqueScore = score;
+
+        if (Array.isArray(critique.extractedMistakes)) {
+          for (const m of critique.extractedMistakes) {
+            await addMistakeEntry(m.subject || state.activeMission.subject, m.wrong, m.correct, true);
+          }
+        }
+
+        const errText = (critique.errors || []).map(e => `- ${e}`).join("\n");
+        let msg = `**RUBRIC SCORE: ${score}/10**\n${critique.verdict}`;
+        if (errText) msg += `\n\n**Missing / Incorrect Points:**\n${errText}`;
+
+        if (score >= 9) {
+          msg += `\n\n**PASSED WITH ELITE PRECISION.** Block logged & XP awarded.`;
+          appendChat("model", msg, "CRITIQUE");
+          speakMentor(`Score ${score} out of 10. ${critique.verdict}`);
+          await completeMissionLoop(score);
+        } else {
+          state.activeMission.stage = "CORRECT";
+          await saveProfileToRTDB();
+          msg += `\n\n**STEP 4 — MANDATORY CORRECTION:**\n${critique.correctionPrompt}`;
+          appendChat("model", msg, "CRITIQUE");
+          speakMentor(`Score ${score} out of 10. Correct your gaps: ${critique.correctionPrompt}`);
+        }
+      } catch (err) {
+        showToast(err.message, "error");
+        state.activeMission.stage = "CORRECT";
+        await saveProfileToRTDB();
+      } finally {
+        setAiBusy(false);
+      }
+    }
+
+    async function verifyCorrectionAndComplete(userCorrection) {
+      setAiBusy(true);
+      try {
+        const reply = await callGemini({
+          contents: [{ role: "user", parts: [{ text: `Step 4 corrected answer for ${state.activeMission.subject} - ${state.activeMission.topic}:\n${userCorrection}\nVerify in 2 crisp sentences.` }] }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] }
+        });
+        appendChat("model", `**CORRECTION LOCKED IN**\n${reply}`, "VERIFIED");
+        speakMentor(`Correction locked in. ${reply}`);
+      } catch (_) {
+        appendChat("model", "**CORRECTION LOCKED IN.** Block logged and XP awarded.", "VERIFIED");
+      } finally {
+        setAiBusy(false);
+        await completeMissionLoop(state.lastCritiqueScore ?? 8);
+      }
+    }
+
+    async function completeMissionLoop(score) {
+      const elapsedSec = (state.timer.durationMinutes * 60) - state.timer.remainingSeconds;
+      const loggedMins = elapsedSec > 60 ? Math.round(elapsedSec / 60) : state.activeMission.durationMinutes;
+      const xpEarned = Math.round(loggedMins * 1.2 + score * 5);
+
+      await addStudyLog({
+        date: getTodayDateStr(), timestamp: formatClock(),
+        subject: state.activeMission.subject, topic: state.activeMission.topic,
+        duration: loggedMins, score, xp: xpEarned, createdAt: Date.now()
+      });
+
+      const match = state.syllabus.find(t => t.topic.toLowerCase() === state.activeMission.topic.toLowerCase());
+      if (match) await updateSyllabusMastery(match.id, Math.min(100, (match.mastery || 0) + (score >= 8 ? 15 : 8)));
+
+      state.activeMission.stage = "ASSIGN";
+      state.lastCritiqueScore = null;
+      await awardXP(xpEarned, `Completed ${state.activeMission.topic}`);
+    }
+
+    async function triggerMedPYQBridgeQuiz() {
+      const pgEntries = Object.entries(state.vault.pgCache || {});
+      if (!pgEntries.length) {
+        showToast("No linked MedPYQ PG stems cached for this subject yet.", "warning");
+        return;
+      }
+      if (window.innerWidth < 1024) switchTab("mentor");
+      setAiBusy(true);
+      const sample = pgEntries.slice(0, 3).map(([qid, obj], i) =>
+        `${i + 1}. [${qid} | ${obj.exam || "PG"}] ${stripHtml(obj.stem).slice(0, 220)}`
+      ).join("\n");
+      try {
+        const reply = await callGemini({
+          contents: [{ role: "user", parts: [{ text: `Quiz me on these 3 real linked MedPYQ PG stems for ${state.vault.subjectKey} without revealing the answer keys yet:\n${sample}` }] }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] }
+        });
+        state.activeMission.stage = "TEST";
+        state.lastTestQuestions = reply;
+        appendChat("model", `**MEDPYQ PG BRIDGE DRILL (${state.vault.subjectKey})**\n${reply}`, "DRILL");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        setAiBusy(false);
+      }
+    }
+
+    // =========================================================================
+    // 8. CRUD (RTDB: admin_private/apex_mentor/*)
+    // =========================================================================
+    async function awardXP(amount, reason = "") {
+      state.profile.xp = (state.profile.xp || 0) + amount;
+      const newLevel = Math.floor(state.profile.xp / 200) + 1;
+      if (newLevel > state.profile.level) {
+        state.profile.level = newLevel;
+        showToast(`LEVEL UP! Level ${newLevel}`, "success");
+      } else if (reason) showToast(`+${amount} XP — ${reason}`, "success");
+      await saveProfileToRTDB();
+    }
+
+    async function addSyllabusTopic(subject, topic, mastery) {
+      const m = Math.max(0, Math.min(100, parseInt(mastery, 10) || 0));
+      const id = `t_${Date.now()}`;
+      const item = { subject: subject.trim(), topic: topic.trim(), mastery: m, status: computeStatus(m), pyqCount: 0, maxRepeat: 1, createdAt: Date.now() };
+      state.syllabus.push({ id, ...item });
+      renderSyllabus();
+      if (state.user) await set(ref(db, `admin_private/apex_mentor/syllabus/${id}`), item);
+    }
+
+    async function updateSyllabusMastery(id, newMastery) {
+      const m = Math.max(0, Math.min(100, parseInt(newMastery, 10) || 0));
+      const status = computeStatus(m);
+      const idx = state.syllabus.findIndex(t => t.id === id);
+      if (idx > -1) { state.syllabus[idx].mastery = m; state.syllabus[idx].status = status; renderSyllabus(); }
+      if (state.user) await update(ref(db, `admin_private/apex_mentor/syllabus/${id}`), { mastery: m, status });
+    }
+
+    async function deleteSyllabusTopic(id) {
+      state.syllabus = state.syllabus.filter(t => t.id !== id);
+      renderSyllabus();
+      if (state.user) await remove(ref(db, `admin_private/apex_mentor/syllabus/${id}`));
+    }
+
+    async function addMistakeEntry(subject, wrong, correct, silent = false) {
+      const id = `m_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`;
+      const item = { subject: (subject || "General").trim(), wrong: wrong.trim(), correct: correct.trim(), status: "Unresolved", createdAt: Date.now() };
+      state.mistakes.unshift({ id, ...item });
+      renderMistakes();
+      if (state.user) await set(ref(db, `admin_private/apex_mentor/mistakes/${id}`), item);
+      if (!silent) showToast("Mistake logged.", "warning");
+    }
+
+    async function toggleMistakeStatus(id) {
+      const item = state.mistakes.find(m => m.id === id);
+      if (!item) return;
+      item.status = item.status === "Fixed" ? "Unresolved" : "Fixed";
+      renderMistakes();
+      if (state.user) await update(ref(db, `admin_private/apex_mentor/mistakes/${id}`), { status: item.status });
+      if (item.status === "Fixed") awardXP(20, "Fixed Mistake Vault gap");
+    }
+
+    async function deleteMistakeEntry(id) {
+      state.mistakes = state.mistakes.filter(m => m.id !== id);
+      renderMistakes();
+      if (state.user) await remove(ref(db, `admin_private/apex_mentor/mistakes/${id}`));
+    }
+
+    async function addStudyLog(logObj) {
+      const id = `l_${Date.now()}`;
+      state.logs.unshift({ id, ...logObj });
+      renderHUD(); renderAnalytics();
+      if (state.user) await set(ref(db, `admin_private/apex_mentor/logs/${id}`), logObj);
+    }
+
+    async function deleteStudyLog(id) {
+      state.logs = state.logs.filter(l => l.id !== id);
+      renderHUD(); renderAnalytics();
+      if (state.user) await remove(ref(db, `admin_private/apex_mentor/logs/${id}`));
+    }
+
+    async function advanceBookmarkSRS(bmKey) {
+      const bm = state.bookmarks[bmKey];
+      if (!bm || !state.user) return;
+      const intervals = [1, 3, 7, 14, 30];
+      const nextStep = Math.min(intervals.length, (bm.current_step || 1) + 1);
+      const nextReview = Date.now() + intervals[nextStep - 1] * 86400000;
+      await update(ref(db, `users/${state.user.uid}/bookmarks/${bmKey}`), { current_step: nextStep, next_review_date: nextReview });
+      bm.current_step = nextStep;
+      bm.next_review_date = nextReview;
+      renderDueBookmarks();
+      awardXP(15, `SRS Recall Passed (${bm.q || bmKey})`);
+    }
+
+    // =========================================================================
+    // 9. AUDIO, WAKE LOCK, TIMER & ALARM
+    // =========================================================================
+    let audioCtx = null, sirenInterval = null, sirenStep = 0;
+    function ensureAudioCtx() {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+    function playTacticalChime() {
+      const ctx = ensureAudioCtx(); if (!ctx) return;
+      const now = ctx.currentTime;
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.type = i === 3 ? "triangle" : "sine";
+        osc.frequency.setValueAtTime(freq, now + i * 0.12);
+        gain.gain.setValueAtTime(0.001, now + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.22, now + i * 0.12 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 0.55);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now + i * 0.12); osc.stop(now + i * 0.12 + 0.6);
+      });
+    }
+    function startEscalatingSiren() {
+      stopSiren(); sirenStep = 0;
+      const pulse = () => {
+        const ctx = ensureAudioCtx(); if (!ctx) return;
+        const now = ctx.currentTime, vol = Math.min(0.45, 0.12 + sirenStep++ * 0.04);
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(680, now);
+        osc.frequency.linearRampToValueAtTime(1120, now + 0.35);
+        osc.frequency.linearRampToValueAtTime(680, now + 0.7);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(vol, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.78);
+      };
+      pulse(); sirenInterval = setInterval(pulse, 900);
+    }
+    function stopSiren() { if (sirenInterval) { clearInterval(sirenInterval); sirenInterval = null; } }
+
+    function speakMentor(text) {
+      if (!state.voiceEnabled || !("speechSynthesis" in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text.replace(/\*\*/g, "").replace(/[#•▸]/g, "").trim());
+        u.rate = state.voiceSpeed; u.pitch = 0.95;
+        u.onstart = () => el.stopSpeechBtn.classList.remove("hidden");
+        u.onend = u.onerror = () => el.stopSpeechBtn.classList.add("hidden");
+        window.speechSynthesis.speak(u);
+      } catch (_) {}
+    }
+    function stopSpeaking() { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); el.stopSpeechBtn.classList.add("hidden"); }
+
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) el.micBtn.classList.add("hidden");
+    let recognition = null, isListening = false;
+    function toggleSpeechRecognition() {
+      if (!SpeechRec) return;
+      if (isListening && recognition) { recognition.stop(); return; }
+      recognition = new SpeechRec();
+      recognition.lang = "en-IN";
+      recognition.onstart = () => { isListening = true; el.micBtn.classList.add("bg-rose-600/30", "border-rose-500", "text-rose-300", "animate-pulse"); };
+      recognition.onresult = (e) => { el.chatInput.value = (el.chatInput.value ? el.chatInput.value + " " : "") + e.results[0][0].transcript; el.chatInput.focus(); };
+      recognition.onend = recognition.onerror = () => { isListening = false; el.micBtn.classList.remove("bg-rose-600/30", "border-rose-500", "text-rose-300", "animate-pulse"); };
+      recognition.start();
+    }
+
+    async function toggleWakeLock() {
+      if (!("wakeLock" in navigator)) return showToast("Wake Lock unsupported on this browser.", "warning");
+      if (state.wakeLockEnabled) {
+        state.wakeLockEnabled = false;
+        if (state.wakeLockSentinel) { try { await state.wakeLockSentinel.release(); } catch (_) {} state.wakeLockSentinel = null; }
+        el.wakeLockDot.className = "w-2 h-2 rounded-full bg-zinc-500";
+        el.wakeLockLabel.textContent = "Awake: Off";
+      } else {
+        try {
+          state.wakeLockSentinel = await navigator.wakeLock.request("screen");
+          state.wakeLockEnabled = true;
+          el.wakeLockDot.className = "w-2 h-2 rounded-full bg-emerald-400";
+          el.wakeLockLabel.textContent = "Awake: On";
+        } catch (_) { showToast("Wake Lock blocked.", "warning"); }
+      }
+    }
+
+    function setTimerDuration(mins) {
+      const m = Math.max(1, Math.min(240, parseInt(mins, 10) || 45));
+      stopTimerInterval();
+      state.timer = { ...state.timer, durationMinutes: m, remainingSeconds: m * 60, isRunning: false, pauseCount: 0 };
+      el.presetBtns.forEach(btn => {
+        const active = parseInt(btn.dataset.preset, 10) === m;
+        btn.className = active
+          ? "preset-btn py-2.5 px-1.5 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 transition active:scale-95"
+          : "preset-btn py-2.5 px-1.5 rounded-xl text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition active:scale-95";
+      });
+      updateTimerUI();
+    }
+    function stopTimerInterval() { if (state.timer.intervalId) { clearInterval(state.timer.intervalId); state.timer.intervalId = null; } }
+    function startTimer() {
+      ensureAudioCtx();
+      if (state.timer.remainingSeconds <= 0) state.timer.remainingSeconds = state.timer.durationMinutes * 60;
+      state.timer.isRunning = true;
+      state.timer.endTimeMs = Date.now() + state.timer.remainingSeconds * 1000;
+      if (state.activeMission.stage === "ASSIGN") { state.activeMission.stage = "STUDY"; saveProfileToRTDB(); }
+      updateTimerUI();
+      stopTimerInterval();
+      state.timer.intervalId = setInterval(() => {
+        const diff = Math.ceil((state.timer.endTimeMs - Date.now()) / 1000);
+        if (diff <= 0) { state.timer.remainingSeconds = 0; triggerTestPhase(); }
+        else { state.timer.remainingSeconds = diff; updateTimerUI(); }
+      }, 250);
+    }
+    function strictPauseTimer() {
+      if (!state.timer.isRunning) return;
+      state.timer.isRunning = false; stopTimerInterval(); state.timer.pauseCount++; updateTimerUI();
+      showToast(`Strict Pause #${state.timer.pauseCount} logged.`, "warning");
+    }
+    function resetTimer() { stopTimerInterval(); state.timer.isRunning = false; state.timer.remainingSeconds = state.timer.durationMinutes * 60; state.timer.pauseCount = 0; updateTimerUI(); }
+    function updateTimerUI() {
+      el.countdownDisplay.textContent = formatTime(state.timer.remainingSeconds);
+      const total = Math.max(1, state.timer.durationMinutes * 60);
+      el.timerProgressBar.style.width = `${Math.max(0, Math.min(100, (state.timer.remainingSeconds / total) * 100))}%`;
+      el.timerSubtext.textContent = `Mission: ${state.activeMission.subject} — ${state.activeMission.topic}`;
+      el.pauseWarningBadge.classList.toggle("hidden", state.timer.pauseCount === 0);
+      el.pauseWarningBadge.textContent = `${state.timer.pauseCount} Pause${state.timer.pauseCount > 1 ? "s" : ""}`;
+      el.startTimerBtn.disabled = state.timer.isRunning;
+      el.strictPauseBtn.disabled = !state.timer.isRunning;
+      el.timerStatusBadge.textContent = state.timer.isRunning ? "LOCKED IN" : (state.timer.remainingSeconds === 0 ? "TEST DUE" : "STANDBY");
+      document.title = state.timer.isRunning ? `${formatTime(state.timer.remainingSeconds)} • APEX MENTOR` : "APEX MENTOR — Progressive AI Study Commander";
+    }
+
+    function triggerWakeUpAlarm() {
+      if (state.alarmRinging) return;
+      state.alarmRinging = true;
+      el.alarmPhraseInput.value = ""; el.alarmPhraseError.classList.add("hidden");
+      el.wakeUpOverlay.classList.remove("hidden");
+      startEscalatingSiren();
+      setTimeout(() => el.alarmPhraseInput.focus(), 100);
+    }
+
+    // =========================================================================
+    // 10. RENDERERS
+    // =========================================================================
+    function renderAllUI() { renderHUD(); renderMissionCard(); updateTimerUI(); renderAlarmSettings(); renderSyllabus(); renderDueBookmarks(); renderMistakes(); renderAnalytics(); renderChat(); }
+
+    function renderHUD() {
+      const target = new Date(state.profile.examDate + "T00:00:00");
+      const diffDays = Math.max(0, Math.ceil((target - new Date()) / 86400000));
+      el.examDaysLeft.textContent = `${diffDays}d LEFT`;
+      el.examTargetDateLabel.textContent = target.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+      el.examDatePicker.value = state.profile.examDate;
+
+      const xp = state.profile.xp || 0, lvl = Math.floor(xp / 200) + 1;
+      el.hudLevelBadge.textContent = `LVL ${lvl}`;
+      el.hudXpText.textContent = `${xp} XP`;
+      el.hudNextXpText.textContent = `${lvl * 200}`;
+      el.hudXpBar.style.width = `${((xp % 200) / 200) * 100}%`;
+
+      const today = getTodayDateStr();
+      const minsToday = state.logs.filter(l => l.date === today).reduce((s, l) => s + (l.duration || 0), 0);
+      el.hudFocusMins.textContent = `${minsToday}m`;
+      el.hudStreak.textContent = `🔥 ${state.profile.streak || 1}d`;
+    }
+
+    function renderMissionCard() {
+      const m = state.activeMission;
+      el.missionTopicTitle.textContent = m.topic || "No Mission Assigned";
+      el.missionSubject.textContent = `${m.subject || "—"}${m.qid ? " • " + m.qid : ""}`;
+      el.missionDurationLabel.textContent = `${m.durationMinutes || 45} mins`;
+      el.missionDeliverable.textContent = m.deliverable || "—";
+      ["ASSIGN", "STUDY", "TEST", "CORRECT"].forEach(st => {
+        const node = $(`step-${st.toLowerCase()}`);
+        if (node) node.className = m.stage === st
+          ? "loop-step py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-black border border-amber-500/70 bg-amber-500/20 text-amber-300 shadow"
+          : "loop-step py-1.5 px-2 rounded-lg text-[10px] sm:text-xs font-bold border border-zinc-800 bg-zinc-950 text-zinc-500";
+      });
+      el.mentorLoopStatusText.textContent = `Stage: ${m.stage}`;
+    }
+
+    function renderAlarmSettings() {
+      el.wakeUpTimeInput.value = state.profile.wakeUpTime || "04:30";
+      el.alarmArmedBadge.textContent = state.profile.alarmArmed ? `ARMED (${state.profile.wakeUpTime})` : "DISARMED";
+      el.toggleAlarmBtn.textContent = state.profile.alarmArmed ? "Disarm" : "Arm";
+    }
+
+    function renderSyllabus() {
+      const subjects = [...new Set(state.syllabus.map(t => t.subject))].sort();
+      const prev = el.syllabusFilterSubject.value;
+      el.syllabusFilterSubject.innerHTML = `<option value="ALL">All Subjects</option>` + subjects.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+      if (subjects.includes(prev)) el.syllabusFilterSubject.value = prev;
+
+      const filtered = state.syllabus.filter(t =>
+        (el.syllabusFilterSubject.value === "ALL" || t.subject === el.syllabusFilterSubject.value) &&
+        (el.syllabusFilterStatus.value === "ALL" || t.status === el.syllabusFilterStatus.value)
+      );
+
+      if (!filtered.length) {
+        el.syllabusList.innerHTML = `<div class="text-center py-8 text-xs text-zinc-500 border border-dashed border-zinc-800 rounded-xl">No chapters match. Hit "Sync PYQs" in the top bar to auto-import curriculumData.</div>`;
+        return;
+      }
+
+      el.syllabusList.innerHTML = filtered.map(t => `
+        <div class="bg-zinc-950 border border-zinc-800/90 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-zinc-900 text-amber-300 border border-zinc-800">${escapeHtml(t.subject)}</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800">${t.pyqCount || 0} PYQs</span>
+              ${(t.maxRepeat || 1) > 1 ? `<span class="text-[10px] font-black px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">🔥 ${t.maxRepeat}× Repeat</span>` : ""}
+            </div>
+            <div class="text-sm font-bold text-white mt-1 truncate">${escapeHtml(t.topic)}</div>
+            <div class="flex items-center gap-2.5 mt-2">
+              <input type="range" min="0" max="100" value="${t.mastery || 0}" data-mastery-id="${t.id}" class="mastery-slider flex-1 accent-amber-500 h-1.5 bg-zinc-800 rounded-lg cursor-pointer" />
+              <span class="font-mono text-xs font-bold text-zinc-300 w-9 text-right">${t.mastery || 0}%</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" data-study-id="${t.id}" class="study-now-btn px-3 py-2 rounded-lg text-xs font-black bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30">Study Now</button>
+            <button type="button" data-del-syllabus="${t.id}" class="del-syllabus-btn p-2 text-zinc-500 hover:text-rose-400">✕</button>
+          </div>
+        </div>
+      `).join("");
+
+      el.syllabusList.querySelectorAll(".mastery-slider").forEach(s => s.addEventListener("change", (e) => updateSyllabusMastery(e.target.dataset.masteryId, e.target.value)));
+      el.syllabusList.querySelectorAll(".study-now-btn").forEach(btn => btn.addEventListener("click", () => {
+        const item = state.syllabus.find(x => x.id === btn.dataset.studyId);
+        if (!item) return;
+        state.activeMission = { id: item.id, qid: "", subject: item.subject, topic: item.topic, durationMinutes: 45, deliverable: `Master ${item.pyqCount || 0} Prof PYQs in ${item.topic} and pass active recall test.`, stage: "STUDY" };
+        setTimerDuration(45); saveProfileToRTDB(); switchTab("command");
+      }));
+      el.syllabusList.querySelectorAll(".del-syllabus-btn").forEach(btn => btn.addEventListener("click", () => deleteSyllabusTopic(btn.dataset.delSyllabus)));
+    }
+
+    function renderDueBookmarks() {
+      const now = Date.now();
+      const due = Object.entries(state.bookmarks || {}).filter(([, bm]) => !bm.next_review_date || bm.next_review_date <= now);
+      el.dueBookmarksBadge.textContent = `${due.length} Due`;
+      if (!due.length) {
+        el.dueBookmarksList.innerHTML = `<div class="text-xs text-zinc-500 py-3 text-center">All MBBS PROFS PREP bookmarks are caught up!</div>`;
+        return;
+      }
+      el.dueBookmarksList.innerHTML = due.slice(0, 15).map(([key, bm]) => `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="text-[10px] font-mono text-indigo-300 font-bold">${escapeHtml(bm.subjectCode || "PYQ")} • ${escapeHtml(bm.q || key)} (Step ${bm.current_step || 1})</div>
+            <div class="text-xs text-zinc-200 truncate mt-0.5">${escapeHtml(stripHtml(bm.stem || bm.question || "Saved Question"))}</div>
+          </div>
+          <button type="button" data-pass-bm="${key}" class="pass-bm-btn shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30">Recalled ✓</button>
+        </div>
+      `).join("");
+      el.dueBookmarksList.querySelectorAll(".pass-bm-btn").forEach(b => b.addEventListener("click", () => advanceBookmarkSRS(b.dataset.passBm)));
+    }
+
+    function renderMistakes() {
+      el.mistakeCountBadge.textContent = state.mistakes.filter(m => m.status !== "Fixed").length;
+      if (!state.mistakes.length) {
+        el.mistakeList.innerHTML = `<div class="text-center py-6 text-xs text-zinc-500 border border-dashed border-zinc-800 rounded-xl">No mistakes logged yet.</div>`;
+        return;
+      }
+      el.mistakeList.innerHTML = state.mistakes.map(m => {
+        const isFixed = m.status === "Fixed";
+        return `
+          <div class="bg-zinc-950 border ${isFixed ? "border-emerald-500/30 opacity-75" : "border-rose-500/30"} rounded-xl p-3.5 space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-zinc-900 text-amber-300 border border-zinc-800">${escapeHtml(m.subject)}</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" data-toggle-m="${m.id}" class="toggle-m-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-900 text-zinc-200 border border-zinc-700">${isFixed ? "Reopen" : "Mark Fixed"}</button>
+                <button type="button" data-del-m="${m.id}" class="del-m-btn px-2 py-1 text-xs text-zinc-500 hover:text-rose-400">✕</button>
+              </div>
+            </div>
+            <div class="text-xs text-rose-300"><strong>Gap:</strong> ${escapeHtml(m.wrong)}</div>
+            <div class="text-xs text-emerald-300"><strong>Fact:</strong> ${escapeHtml(m.correct)}</div>
+          </div>`;
+      }).join("");
+      el.mistakeList.querySelectorAll(".toggle-m-btn").forEach(b => b.addEventListener("click", () => toggleMistakeStatus(b.dataset.toggleM)));
+      el.mistakeList.querySelectorAll(".del-m-btn").forEach(b => b.addEventListener("click", () => deleteMistakeEntry(b.dataset.delM)));
+    }
+
+    function renderAnalytics() {
+      const today = getTodayDateStr();
+      const todayLogs = state.logs.filter(l => l.date === today);
+      const totalHours = todayLogs.reduce((s, l) => s + (l.duration || 0), 0) / 60;
+      const goalHrs = state.profile.dailyGoalHours || 8;
+      const pct = Math.min(100, Math.round((totalHours / goalHrs) * 100));
+      const scored = todayLogs.filter(l => typeof l.score === "number");
+      el.dailyGoalHoursInput.value = goalHrs;
+      el.dailyGoalProgressText.textContent = `${totalHours.toFixed(1)}h / ${goalHrs}h (${pct}%)`;
+      el.dailyGoalBar.style.width = `${pct}%`;
+      el.kpiFocusHours.textContent = `${totalHours.toFixed(1)}h`;
+      el.kpiBlocksDone.textContent = todayLogs.length;
+      el.kpiAvgScore.textContent = scored.length ? `${(scored.reduce((s, l) => s + l.score, 0) / scored.length).toFixed(1)}/10` : "—/10";
+      el.kpiXpToday.textContent = `+${todayLogs.reduce((s, l) => s + (l.xp || 0), 0)}`;
+
+      el.analyticsLogList.innerHTML = state.logs.length ? state.logs.map(l => `
+        <div class="bg-zinc-950 border border-zinc-800/90 rounded-xl p-3 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap text-[10px] font-bold">
+              <span class="font-mono text-zinc-400">${escapeHtml(l.date)} • ${escapeHtml(l.timestamp)}</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">${l.duration}m</span>
+              <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300">${l.score ?? "—"}/10</span>
+              <span class="px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300">+${l.xp || 0} XP</span>
+            </div>
+            <div class="text-xs font-bold text-white mt-1 truncate">${escapeHtml(l.subject)} — ${escapeHtml(l.topic)}</div>
+          </div>
+          <button type="button" data-del-log="${l.id}" class="del-log-btn p-1.5 text-zinc-500 hover:text-rose-400 text-xs">✕</button>
+        </div>`).join("") : `<div class="text-center py-6 text-xs text-zinc-500">No blocks logged yet.</div>`;
+      el.analyticsLogList.querySelectorAll(".del-log-btn").forEach(b => b.addEventListener("click", () => deleteStudyLog(b.dataset.delLog)));
+    }
+
+    function appendChat(role, text, tag = null) { state.chatHistory.push({ role, text, tag, time: formatClock() }); renderChat(); }
+    function setAiBusy(busy) { state.isAiBusy = busy; el.sendChatBtn.disabled = busy; renderChat(); }
+    function renderChat() {
+      el.chatMessages.innerHTML = state.chatHistory.map(m => m.role === "user"
+        ? `<div class="flex justify-end"><div class="max-w-[86%] bg-amber-500 text-zinc-950 font-medium rounded-2xl rounded-br-sm px-3.5 py-2.5 shadow text-sm whitespace-pre-wrap">${escapeHtml(m.text)}</div></div>`
+        : `<div class="flex justify-start"><div class="max-w-[90%] bg-zinc-950 border border-zinc-800 text-zinc-200 rounded-2xl rounded-bl-sm px-3.5 py-3 shadow text-sm leading-relaxed">${m.tag ? `<span class="inline-block mb-1 px-2 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">${m.tag}</span><br/>` : ""}${formatMarkdown(m.text)}</div></div>`
+      ).join("") + (state.isAiBusy ? `<div class="text-xs text-amber-400 font-mono animate-pulse">Commander analyzing vault...</div>` : "");
+      el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+    }
+
+    async function handleChatSubmit(rawText) {
+      const text = rawText.trim();
+      if (!text || state.isAiBusy) return;
+      ensureAudioCtx();
+      el.chatInput.value = ""; el.chatInput.style.height = "auto";
+      appendChat("user", text);
+
+      if (state.activeMission.stage === "TEST") return evaluateTestAnswer(text);
+      if (state.activeMission.stage === "CORRECT") return verifyCorrectionAndComplete(text);
+
+      setAiBusy(true);
+      try {
+        const recent = state.chatHistory.slice(-8).map(m => ({ role: m.role === "user" ? "user" : "model", parts: [{ text: m.text }] }));
+        while (recent.length > 1 && recent[0].role !== "user") recent.shift();
+        const reply = await callGemini({
+          contents: recent,
+          systemInstruction: { parts: [{ text: buildCommanderContext() + "\nKeep replies sharp, tactical, grounded in the PYQ vault above." }] }
+        });
+        appendChat("model", reply);
+        speakMentor(reply);
+      } catch (err) {
+        appendChat("model", `Error: ${err.message}`);
+      } finally {
+        setAiBusy(false);
+      }
+    }
+
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      const isDesktop = window.innerWidth >= 1024;
+      el.navTabs.forEach(btn => {
+        const active = btn.dataset.tab === tabName;
+        btn.className = (active
+          ? "nav-tab shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-amber-500 text-zinc-950 shadow flex items-center gap-1.5"
+          : "nav-tab shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 flex items-center gap-1.5") + (btn.dataset.tab === "mentor" ? " lg:hidden relative" : "");
+      });
+      if (isDesktop) {
+        el.workspacePane.classList.remove("hidden"); el.mentorPane.classList.remove("hidden"); el.mentorPane.classList.add("flex");
+        const eff = tabName === "mentor" ? "command" : tabName;
+        el.tabPanels.forEach(p => p.classList.toggle("hidden", p.id !== `tab-${eff}`));
+      } else {
+        const showMentor = tabName === "mentor";
+        el.workspacePane.classList.toggle("hidden", showMentor);
+        el.mentorPane.classList.toggle("hidden", !showMentor);
+        el.mentorPane.classList.toggle("flex", showMentor);
+        if (showMentor) { el.mobileMentorBadge.classList.add("hidden"); el.chatMessages.scrollTop = el.chatMessages.scrollHeight; }
+        else el.tabPanels.forEach(p => p.classList.toggle("hidden", p.id !== `tab-${tabName}`));
+      }
+    }
+
+    // =========================================================================
+    // 11. EVENT BINDINGS & BOOT
+    // =========================================================================
+    el.loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      el.loginError.classList.add("hidden");
+      el.loginSubmitBtn.disabled = true;
+      try {
+        const email = el.loginEmail.value.trim().toLowerCase();
+        if (!ADMIN_EMAILS.includes(email)) throw new Error("Access denied: Owner/Admin email required.");
+        await signInWithEmailAndPassword(auth, email, el.loginPassword.value);
+      } catch (err) {
+        el.loginError.textContent = err.message;
+        el.loginError.classList.remove("hidden");
+      } finally {
+        el.loginSubmitBtn.disabled = false;
+      }
+    });
+
+    el.syncVaultBtn.addEventListener("click", () => loadActiveSubjectVault(true));
+    el.vaultCollegeSelect.addEventListener("change", () => loadActiveSubjectVault(false));
+    el.vaultSubjectSelect.addEventListener("change", () => loadActiveSubjectVault(false));
+    el.navTabs.forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+    window.addEventListener("resize", () => switchTab(state.activeTab));
+
+    el.openSettingsBtn.addEventListener("click", () => {
+      el.settingsGeminiKey.value = state.geminiKey;
+      el.settingsGeminiModel.value = state.geminiModel;
+      el.settingsModal.classList.remove("hidden");
+    });
+    el.closeSettingsBtn.addEventListener("click", () => el.settingsModal.classList.add("hidden"));
+    el.saveSettingsBtn.addEventListener("click", async () => {
+      state.geminiKey = el.settingsGeminiKey.value.trim();
+      state.geminiModel = el.settingsGeminiModel.value;
+      localStorage.setItem("apex_gemini_key", state.geminiKey);
+      localStorage.setItem("apex_gemini_model", state.geminiModel);
+      if (state.user) {
+        await update(ref(db, "admin_private/apex_mentor/config"), { geminiKey: state.geminiKey, geminiModel: state.geminiModel }).catch(() => {});
+      }
+      el.settingsModal.classList.add("hidden");
+      showToast("Settings saved & synced.", "success");
+    });
+    el.clearCacheBtn.addEventListener("click", async () => { await idbClear(); showToast("Local PYQ IndexedDB cache cleared.", "info"); });
+    el.logoutBtn.addEventListener("click", async () => { el.settingsModal.classList.add("hidden"); await signOut(auth); });
+
+    el.voiceToggleBtn.addEventListener("click", () => {
+      state.voiceEnabled = !state.voiceEnabled;
+      el.voiceDot.className = `w-2 h-2 rounded-full ${state.voiceEnabled ? "bg-emerald-400" : "bg-zinc-600"}`;
+      if (!state.voiceEnabled) stopSpeaking();
+    });
+    el.voiceSpeedSelect.addEventListener("change", (e) => { state.voiceSpeed = parseFloat(e.target.value) || 1.75; });
+    el.stopSpeechBtn.addEventListener("click", stopSpeaking);
+    el.wakeLockBtn.addEventListener("click", toggleWakeLock);
+
+    el.examCountdownBtn.addEventListener("click", () => el.examDateModal.classList.remove("hidden"));
+    el.cancelExamDateBtn.addEventListener("click", () => el.examDateModal.classList.add("hidden"));
+    el.saveExamDateBtn.addEventListener("click", () => {
+      if (el.examDatePicker.value) { state.profile.examDate = el.examDatePicker.value; saveProfileToRTDB(); el.examDateModal.classList.add("hidden"); }
+    });
+
+    el.prescribeMissionBtn.addEventListener("click", prescribeNextMission);
+    el.bridgePgQuizBtn.addEventListener("click", triggerMedPYQBridgeQuiz);
+    el.presetBtns.forEach(btn => btn.addEventListener("click", () => { el.customMinInput.value = ""; setTimerDuration(btn.dataset.preset); }));
+    el.customMinInput.addEventListener("change", () => { if (parseInt(el.customMinInput.value, 10) > 0) setTimerDuration(el.customMinInput.value); });
+    el.startTimerBtn.addEventListener("click", startTimer);
+    el.strictPauseBtn.addEventListener("click", strictPauseTimer);
+    el.resetTimerBtn.addEventListener("click", resetTimer);
+    el.finishAndTestBtn.addEventListener("click", triggerTestPhase);
+
+    el.lazyEmergencyBtn.addEventListener("click", () => {
+      ensureAudioCtx(); playTacticalChime(); el.ignitionModal.classList.remove("hidden");
+      if (state.ignitionIntervalId) clearInterval(state.ignitionIntervalId);
+      let secs = 180; el.ignitionClock.textContent = formatTime(secs);
+      state.ignitionIntervalId = setInterval(() => {
+        el.ignitionClock.textContent = formatTime(--secs);
+        if (secs <= 0) { clearInterval(state.ignitionIntervalId); playTacticalChime(); }
+      }, 1000);
+    });
+    el.closeIgnitionBtn.addEventListener("click", () => { if (state.ignitionIntervalId) clearInterval(state.ignitionIntervalId); el.ignitionModal.classList.add("hidden"); });
+    el.ignitionStartFullBtn.addEventListener("click", () => { if (state.ignitionIntervalId) clearInterval(state.ignitionIntervalId); el.ignitionModal.classList.add("hidden"); startTimer(); awardXP(10, "Broke inertia"); });
+
+    el.testAlarmHudBtn.addEventListener("click", triggerWakeUpAlarm);
+    el.testAlarmCardBtn.addEventListener("click", triggerWakeUpAlarm);
+    el.wakeUpTimeInput.addEventListener("change", () => { state.profile.wakeUpTime = el.wakeUpTimeInput.value; saveProfileToRTDB(); renderAlarmSettings(); });
+    el.toggleAlarmBtn.addEventListener("click", () => { ensureAudioCtx(); state.profile.alarmArmed = !state.profile.alarmArmed; saveProfileToRTDB(); renderAlarmSettings(); });
+    el.dismissAlarmForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (el.alarmPhraseInput.value.trim().toLowerCase() === COMMITMENT_PHRASE.toLowerCase()) {
+        stopSiren(); state.alarmRinging = false; el.wakeUpOverlay.classList.add("hidden"); awardXP(15, "Won wake-up battle");
+      } else el.alarmPhraseError.classList.remove("hidden");
+    });
+
+    el.syllabusFilterSubject.addEventListener("change", renderSyllabus);
+    el.syllabusFilterStatus.addEventListener("change", renderSyllabus);
+    el.addTopicForm.addEventListener("submit", (e) => { e.preventDefault(); addSyllabusTopic(el.newTopicSubject.value, el.newTopicName.value, el.newTopicMastery.value); el.newTopicName.value = ""; });
+    el.addMistakeForm.addEventListener("submit", (e) => { e.preventDefault(); addMistakeEntry(el.mistakeSubjectInput.value, el.mistakeWrongInput.value, el.mistakeCorrectInput.value); el.mistakeWrongInput.value = ""; el.mistakeCorrectInput.value = ""; });
+    el.drillMistakesBtn.addEventListener("click", () => {
+      const unresolved = state.mistakes.filter(m => m.status !== "Fixed").slice(0, 5);
+      if (!unresolved.length) return showToast("Zero unresolved mistakes!", "info");
+      handleChatSubmit("Drill me on these unresolved mistakes without revealing answers:\n" + unresolved.map((m, i) => `${i + 1}. [${m.subject}] ${m.wrong} -> ${m.correct}`).join("\n"));
+    });
+    el.dailyGoalHoursInput.addEventListener("change", () => { state.profile.dailyGoalHours = Math.max(1, Math.min(16, parseInt(el.dailyGoalHoursInput.value, 10) || 8)); saveProfileToRTDB(); renderAnalytics(); });
+    el.micBtn.addEventListener("click", toggleSpeechRecognition);
+    el.chatForm.addEventListener("submit", (e) => { e.preventDefault(); handleChatSubmit(el.chatInput.value); });
+    el.chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleChatSubmit(el.chatInput.value); } });
+    el.quickChips.forEach(c => c.addEventListener("click", () => handleChatSubmit(c.dataset.quick)));
+
+    setInterval(() => {
+      const now = new Date();
+      el.liveClockDisplay.textContent = `Now: ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+      const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      if (state.profile.alarmArmed && hhmm === state.profile.wakeUpTime && state.alarmTriggeredMinute !== hhmm) {
+        state.alarmTriggeredMinute = hhmm; triggerWakeUpAlarm();
+      }
+    }, 1000);
+
+    switchTab("command");
+    appendChat("model", "**APEX MENTOR READY.** Sign in with your Admin account, enter your Gemini API key in ⚙️ Settings, and your AIIMS Prof PYQs + MedPYQ PG bridge will sync automatically.", "ORDER");
+  </script>
+</body>
+</html>
