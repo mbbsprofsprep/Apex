@@ -62,12 +62,12 @@
         </div>
         <div>
           <h1 class="text-lg font-black tracking-wider text-white uppercase">APEX MENTOR</h1>
-          <p class="text-xs text-zinc-400">Owner-Only Vault &amp; PYQ Commander</p>
+          <p class="text-xs text-zinc-400">Owner-Only Adaptive Study Commander</p>
         </div>
       </div>
 
       <p class="text-xs text-zinc-400 mb-5 leading-relaxed">
-        Sign in with your <strong class="text-amber-300">Admin Email</strong> to unlock all 19 AIIMS Prof subjects + all 4 MedPYQ PG exams (NEET-PG, INI-CET, UPSC-CMS, FMGE).
+        Sign in with your <strong class="text-amber-300">Admin Email</strong> to unlock all 19 AIIMS Prof subjects + all 4 MedPYQ PG exams + adaptive daily/weekly planning.
       </p>
 
       <form id="loginForm" class="space-y-3.5">
@@ -109,7 +109,7 @@
                 <span id="cloudSyncText">Locked</span>
               </span>
             </div>
-            <p class="text-[11px] text-zinc-400 hidden sm:block">MBBS Profs + Full MedPYQ Direct</p>
+            <p class="text-[11px] text-zinc-400 hidden sm:block">Profs + MedPYQ • Adaptive Commander</p>
           </div>
         </div>
 
@@ -252,12 +252,12 @@
       <!-- TAB 1: COMMAND -->
       <section id="tab-command" class="tab-panel space-y-5">
 
-        <!-- EXTENSIVE UPCOMING EXAM DATE SHEET TIMELINE + FOCUS OVERRIDE -->
+        <!-- 1. UPCOMING EXAM DATE SHEET TIMELINE -->
         <div class="bg-zinc-900/90 border border-indigo-500/35 rounded-2xl p-4 shadow-xl space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">📅 Upcoming Exam Date Sheet &amp; Goals</span>
-              <p class="text-[11px] text-zinc-400">Auto-updates from Gemini chat or manual edit. Nearest exam drives HUD countdown.</p>
+              <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">📅 Upcoming Exam Date Sheet</span>
+              <p class="text-[11px] text-zinc-400">Nearest exam drives HUD &amp; AI pacing. Update via chat or button.</p>
             </div>
             <div class="flex items-center gap-1.5">
               <button id="clearFocusOverrideBtn" type="button" class="hidden px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30">
@@ -270,14 +270,39 @@
           </div>
 
           <div id="directiveFocusRow" class="hidden px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
-            <span class="font-black uppercase text-[10px] text-amber-400 mr-1.5">🎯 Active Focus Override:</span>
+            <span class="font-black uppercase text-[10px] text-amber-400 mr-1.5">🎯 Focus Override:</span>
             <span id="directiveFocusText"></span>
           </div>
 
-          <div id="examScheduleTimeline" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1"></div>
+          <div id="examScheduleTimeline" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"></div>
         </div>
 
-        <!-- Active Mission Card -->
+        <!-- 2. DAILY OBJECTIVES, WEEKLY AIMS & EMERGENCY REBALANCE -->
+        <div class="bg-zinc-900/90 border border-emerald-500/30 rounded-2xl p-4 shadow-xl space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">🎯 Daily Objectives &amp; Weekly Targets</span>
+              <p id="objectivesProgressSummary" class="text-[11px] text-zinc-400">0/0 completed today</p>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button id="emergencyOffBtn" type="button" class="px-2.5 py-1.5 rounded-lg text-[11px] font-black bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition active:scale-95" title="Log an emergency off day & auto-rebalance remaining days">
+                🚑 Emergency Off
+              </button>
+              <button id="generatePlanBtn" type="button" class="px-3 py-1.5 rounded-lg text-[11px] font-black bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition active:scale-95">
+                🗓️ Build / Rebalance Plan
+              </button>
+            </div>
+          </div>
+
+          <div id="dailyObjectivesList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+
+          <div id="weeklyGoalsContainer" class="hidden pt-2 border-t border-zinc-800/80">
+            <div class="text-[10px] font-black uppercase tracking-wider text-zinc-500 mb-1.5">This Week's Aims</div>
+            <div id="weeklyGoalsList" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- 3. ACTIVE MISSION CARD -->
         <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
@@ -285,7 +310,7 @@
               <h2 id="missionTopicTitle" class="text-lg sm:text-xl font-extrabold text-white mt-0.5">No Mission Assigned Yet</h2>
             </div>
             <div class="flex items-center gap-2">
-              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95" title="Quiz 3 MedPYQ PG stems (NEET-PG / INI-CET / CMS / FMGE)">
+              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95">
                 MedPYQ PG Drill
               </button>
               <button id="prescribeMissionBtn" type="button" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 shadow-lg shadow-amber-500/20 transition active:scale-95">
@@ -305,7 +330,7 @@
             </div>
             <div>
               <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Deliverable</div>
-              <div id="missionDeliverable" class="text-xs text-zinc-300 mt-0.5 line-clamp-2">Hit Prescribe or chat your exam date sheet / focus topic.</div>
+              <div id="missionDeliverable" class="text-xs text-zinc-300 mt-0.5 line-clamp-2">Hit Prescribe or Build Plan.</div>
             </div>
           </div>
 
@@ -317,7 +342,7 @@
           </div>
         </div>
 
-        <!-- Timer Card -->
+        <!-- 4. TIMER CARD -->
         <div id="timerCard" class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl">
           <div class="flex items-center justify-between gap-2 mb-4">
             <div class="flex items-center gap-2">
@@ -351,12 +376,12 @@
           </div>
         </div>
 
-        <!-- Inertia Breaker + Wake-Up Alarm -->
+        <!-- 5. INERTIA BREAKER + WAKE-UP ALARM -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div class="bg-zinc-900/90 border border-rose-500/30 rounded-2xl p-5 flex flex-col justify-between gap-4">
             <div>
               <div class="text-rose-400 text-xs font-black uppercase tracking-widest">⚠️ Inertia Breaker</div>
-              <p class="text-xs text-zinc-400 mt-1.5">Scrolling or stuck? Trigger a blunt mentor order + 3-minute micro-ignition countdown.</p>
+              <p class="text-xs text-zinc-400 mt-1.5">Scrolling or stuck? Trigger a 3-minute micro-ignition countdown.</p>
             </div>
             <button id="lazyEmergencyBtn" type="button" class="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-rose-600 hover:bg-rose-500 text-white shadow-lg transition active:scale-95">
               I'm Feeling Lazy / Stuck
@@ -517,9 +542,9 @@
 
       <div class="p-3 border-t border-zinc-800 bg-zinc-950/90">
         <div class="flex flex-wrap gap-1.5 mb-2.5">
-          <button type="button" data-quick="Analyze all Prof PYQs and MedPYQ stems (NEET-PG, INI-CET, CMS, FMGE) in this subject and list the top 5 highest-yield topics I must master first." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">High-Yield Analysis</button>
+          <button type="button" data-quick="Analyze all Prof PYQs and MedPYQ stems in this subject and list the top 5 highest-yield topics I must master first." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">High-Yield Analysis</button>
           <button type="button" data-quick="Give me a 10-mark Prof answer skeleton (headings + diagram + viva traps) for my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">10-Mark Skeleton</button>
-          <button type="button" data-quick="Test me with 3 rapid-fire high-yield PYQs on my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-rose-500/20 hover:text-rose-300 text-zinc-300 border border-zinc-800 transition">Quiz Me Now</button>
+          <button type="button" data-quick="I had an emergency off today. Rebalance my remaining days and update my daily objectives and weekly aims." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-rose-500/20 hover:text-rose-300 text-zinc-300 border border-zinc-800 transition">Rebalance Off-Day</button>
         </div>
 
         <form id="chatForm" class="flex items-end gap-2">
@@ -528,7 +553,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
           </button>
-          <textarea id="chatInput" rows="1" placeholder="Share date sheet, add/edit exams, set a focus topic, or answer..." class="flex-1 resize-none px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 max-h-32 transition"></textarea>
+          <textarea id="chatInput" rows="1" placeholder="Share date sheet, report progress, request off-day rebalance..." class="flex-1 resize-none px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 max-h-32 transition"></textarea>
           <button id="sendChatBtn" type="submit" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 font-black text-sm transition active:scale-95 shrink-0">Send</button>
         </form>
       </div>
@@ -543,7 +568,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-base font-extrabold text-white">📅 Exam Date Sheet Manager</h3>
-          <p class="text-[11px] text-zinc-400">Add, edit, or delete upcoming exams. You can also update via Gemini chat.</p>
+          <p class="text-[11px] text-zinc-400">Add, edit, or delete upcoming exams. Synced to Firebase RTDB.</p>
         </div>
         <button id="closeScheduleModalBtn" type="button" class="text-zinc-400 hover:text-white text-sm font-bold">✕</button>
       </div>
@@ -636,7 +661,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION LOGIC (Dual Firebase RTDB + IndexedDB + 2026 Gemini)      -->
+  <!-- APPLICATION LOGIC (Dual Firebase RTDB + Adaptive Planner + Proactive) -->
   <!-- ===================================================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -689,8 +714,9 @@
     };
 
     const COMMITMENT_PHRASE = "I am awake and starting now";
-    const IDB_NAME = "ApexMentorPYQCache_v5";
+    const IDB_NAME = "ApexMentorPYQCache_v6";
     const IDB_STORE = "vaults";
+    const IDLE_CHECKIN_MS = 60 * 60 * 1000; // 60 minutes
 
     const app = initializeApp(PROFS_FIREBASE_CONFIG);
     const auth = getAuth(app);
@@ -708,6 +734,7 @@
       medpyqUser: null,
       geminiKey: localStorage.getItem("apex_gemini_key") || "",
       geminiModel: localStorage.getItem("apex_gemini_model") || "gemini-3.5-flash-lite",
+      lastActivityMs: Date.now(),
       vault: {
         college: "deoghar",
         subjectKey: "OPHTHALMOLOGY",
@@ -724,7 +751,11 @@
       profile: {
         xp: 0, level: 1, streak: 1,
         examDate: "2026-12-04",
-        examSchedule: [], // [{ id, subject, paper, type, date }]
+        examSchedule: [],       // [{ id, subject, paper, type, date }]
+        dailyObjectives: [],    // [{ id, subject, text, done, date }]
+        weeklyGoals: [],        // [{ id, text, targetDate, done }]
+        emergencyOffDays: [],   // ["YYYY-MM-DD"]
+        lastDailyCheckInDate: "",
         focusOverride: "",
         dailyGoalHours: 8, wakeUpTime: "04:30", alarmArmed: false
       },
@@ -774,6 +805,9 @@
       directiveFocusRow: $("directiveFocusRow"), directiveFocusText: $("directiveFocusText"),
       clearFocusOverrideBtn: $("clearFocusOverrideBtn"), openScheduleModalBtn: $("openScheduleModalBtn"),
       examScheduleTimeline: $("examScheduleTimeline"),
+      objectivesProgressSummary: $("objectivesProgressSummary"), emergencyOffBtn: $("emergencyOffBtn"),
+      generatePlanBtn: $("generatePlanBtn"), dailyObjectivesList: $("dailyObjectivesList"),
+      weeklyGoalsContainer: $("weeklyGoalsContainer"), weeklyGoalsList: $("weeklyGoalsList"),
       examScheduleModal: $("examScheduleModal"), closeScheduleModalBtn: $("closeScheduleModalBtn"),
       addExamForm: $("addExamForm"), examSubInput: $("examSubInput"), examPaperInput: $("examPaperInput"),
       examTypeInput: $("examTypeInput"), examDateInput: $("examDateInput"), scheduleModalList: $("scheduleModalList"),
@@ -860,9 +894,11 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     };
     const daysUntil = (dateStr) => {
+      if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return 999;
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const target = new Date(dateStr + "T00:00:00");
-      return Math.ceil((target - today) / 86400000);
+      const diff = Math.ceil((target - today) / 86400000);
+      return Number.isNaN(diff) ? 999 : diff;
     };
     const formatTime = (sec) => {
       const s = Math.max(0, Math.floor(sec));
@@ -970,6 +1006,8 @@
 
       if (!state.geminiKey) {
         showToast("Add your Gemini API key in ⚙️ Settings to activate AI Commander.", "warning");
+      } else {
+        setTimeout(() => runProactiveDailyBriefingIfNeeded(), 2000);
       }
     });
 
@@ -987,9 +1025,10 @@
       }
       if (data.profile) {
         state.profile = { ...state.profile, ...data.profile };
-        state.profile.examSchedule = Array.isArray(data.profile.examSchedule)
-          ? data.profile.examSchedule.filter(Boolean)
-          : Object.values(data.profile.examSchedule || {}).filter(Boolean);
+        state.profile.examSchedule = Array.isArray(data.profile.examSchedule) ? data.profile.examSchedule.filter(Boolean) : Object.values(data.profile.examSchedule || {}).filter(Boolean);
+        state.profile.dailyObjectives = Array.isArray(data.profile.dailyObjectives) ? data.profile.dailyObjectives.filter(Boolean) : Object.values(data.profile.dailyObjectives || {}).filter(Boolean);
+        state.profile.weeklyGoals = Array.isArray(data.profile.weeklyGoals) ? data.profile.weeklyGoals.filter(Boolean) : Object.values(data.profile.weeklyGoals || {}).filter(Boolean);
+        state.profile.emergencyOffDays = Array.isArray(data.profile.emergencyOffDays) ? data.profile.emergencyOffDays.filter(Boolean) : Object.values(data.profile.emergencyOffDays || {}).filter(Boolean);
       }
       if (data.activeMission) state.activeMission = { ...state.activeMission, ...data.activeMission };
 
@@ -1001,15 +1040,14 @@
     }
 
     async function saveProfileToRTDB() {
-      // Keep examSchedule sorted chronologically
       state.profile.examSchedule = (state.profile.examSchedule || [])
-        .filter(e => e && e.subject && e.date)
+        .filter(e => e && e.subject && /^\d{4}-\d{2}-\d{2}$/.test(e.date))
         .sort((a, b) => a.date.localeCompare(b.date));
 
       const nextExam = getNearestUpcomingExam();
       if (nextExam) state.profile.examDate = nextExam.date;
 
-      renderHUD(); renderExamSchedule(); renderMissionCard();
+      renderHUD(); renderExamSchedule(); renderObjectivesPanel(); renderMissionCard();
       if (!state.user) return;
       await update(ref(db, "admin_private/apex_mentor"), {
         profile: state.profile,
@@ -1056,7 +1094,7 @@
           if (mSnap && mSnap.exists()) { matchedKey = k; remoteVer = Number(mSnap.val() || 1); break; }
         }
 
-        const cacheKey = `full_vault_v5_${college}_${subjectKey}`;
+        const cacheKey = `full_vault_v6_${college}_${subjectKey}`;
         const cached = !forceRefresh ? await idbGet(cacheKey) : null;
         let bank = null, pgCache = {}, pgCounts = { "neet-pg": 0, inicet: 0, "upsc-cms": 0, fmge: 0 };
         let medpyqDenied = false;
@@ -1067,13 +1105,11 @@
           pgCounts = cached.pgCounts || pgCounts;
           matchedKey = cached.matchedKey || matchedKey;
         } else {
-          // 1. Pull ALL Prof PYQs from mbbs-profs-prep48c RTDB
           for (const k of [matchedKey, ...aliases.filter(a => a !== matchedKey)]) {
             const bSnap = await get(ref(db, `question_banks/${college}/${k}`)).catch(() => null);
             if (bSnap && bSnap.exists()) { bank = bSnap.val(); matchedKey = k; break; }
           }
 
-          // 2. Fallback to static GitHub JSON files
           if (!bank) {
             for (const k of aliases) {
               try {
@@ -1083,7 +1119,6 @@
             }
           }
 
-          // 3. Pull 100% of ALL 4 MedPYQ PG exams directly from medpyq-elearning
           const pgExams = [
             { key: "neet-pg", pfx: "N", label: "NEET-PG" },
             { key: "inicet", pfx: "IN", label: "INI-CET" },
@@ -1114,7 +1149,6 @@
           }));
 
           bank = bank || {};
-          // Only cache if MedPYQ wasn't blocked by missing auth
           if (!medpyqDenied) {
             await idbSet(cacheKey, { ver: remoteVer, matchedKey, bank, pgCache, pgCounts });
           }
@@ -1226,7 +1260,7 @@
     }
 
     // =========================================================================
-    // 6. GEMINI API CLIENT
+    // 6. GEMINI API CLIENT & FULL-AWARENESS CONTEXT
     // =========================================================================
     async function callGemini(payload, maxRetries = 2) {
       if (!state.geminiKey) {
@@ -1267,16 +1301,31 @@
         .join("; ") || "None";
 
       const scheduleStr = (state.profile.examSchedule || []).length
-        ? state.profile.examSchedule.map(e => `- ${e.date} (${daysUntil(e.date)}d): ${e.subject} ${e.paper || ""} [${e.type || "Theory"}]`).join("\n")
-        : `Single fallback date: ${state.profile.examDate}`;
+        ? state.profile.examSchedule.map(e => `- ${e.date} (${daysUntil(e.date)}d left): ${e.subject} ${e.paper || ""} [${e.type || "Theory"}]`).join("\n")
+        : `Fallback target date: ${state.profile.examDate}`;
 
-      return `You are APEX MENTOR — a direct, tactical study commander for an MBBS student. Today's date is ${today}.
-Analyze the raw Prof PYQs + MedPYQ PG stems below yourself to identify high-yield topics.
+      const objStr = (state.profile.dailyObjectives || []).length
+        ? state.profile.dailyObjectives.map(o => `- [${o.done ? "DONE" : "PENDING"}] (${o.subject || "General"}) ${o.text}`).join("\n")
+        : "None set for today yet.";
+
+      const weekStr = (state.profile.weeklyGoals || []).length
+        ? state.profile.weeklyGoals.map(w => `- [${w.done ? "DONE" : "OPEN"}] ${w.text} (by ${w.targetDate || "this week"})`).join("\n")
+        : "None set yet.";
+
+      return `You are APEX MENTOR — a direct, adaptive tactical study commander for an MBBS student. Today is ${today}.
+Always keep ALL upcoming exams, daily objectives, weekly aims, and any emergency off-days in mind for every answer and plan.
 
 UPCOMING EXAM DATE SHEET (HIGHEST PRIORITY):
 ${scheduleStr}
 
-CURRENT FOCUS OVERRIDE: ${state.profile.focusOverride || "None (follow nearest exam + weakest high-yield chapters)"}
+TODAY'S OBJECTIVES:
+${objStr}
+
+WEEKLY AIMS:
+${weekStr}
+
+EMERGENCY OFF-DAYS LOGGED: ${(state.profile.emergencyOffDays || []).slice(-5).join(", ") || "None"}
+CURRENT FOCUS OVERRIDE: ${state.profile.focusOverride || "None"}
 
 CURRENT STATE:
 - Active Vault: ${state.vault.college.toUpperCase()} / ${state.vault.subjectKey} (${state.vault.matchedKey})
@@ -1289,17 +1338,154 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 7. 4-STEP PROGRESSIVE MENTOR LOOP
+    // 7. ADAPTIVE DAILY/WEEKLY PLANNER, EMERGENCY OFF & PROACTIVE CHECK-INS
+    // =========================================================================
+    async function generateOrRebalancePlan(reasonPrompt = "") {
+      if (state.isAiBusy) return;
+      state.lastActivityMs = Date.now();
+      setAiBusy(true);
+      el.generatePlanBtn.disabled = true;
+
+      try {
+        const raw = await callGemini({
+          contents: [{
+            role: "user",
+            parts: [{
+              text: reasonPrompt || "Based on ALL my upcoming exam dates, remaining days, weakest high-yield chapters, and any unfinished tasks, generate 4-6 crisp, concrete Daily Objectives for today and 3-4 Weekly Aims."
+            }]
+          }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                summaryReply: { type: "STRING" },
+                dailyObjectives: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: { subject: { type: "STRING" }, text: { type: "STRING" } },
+                    required: ["subject", "text"]
+                  }
+                },
+                weeklyGoals: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: { text: { type: "STRING" }, targetDate: { type: "STRING" } },
+                    required: ["text"]
+                  }
+                }
+              },
+              required: ["summaryReply", "dailyObjectives", "weeklyGoals"]
+            }
+          }
+        });
+
+        const plan = safeParseJSON(raw);
+        const today = getTodayDateStr();
+        if (Array.isArray(plan.dailyObjectives) && plan.dailyObjectives.length) {
+          state.profile.dailyObjectives = plan.dailyObjectives.map((o, i) => ({
+            id: `obj_${Date.now()}_${i}`,
+            subject: o.subject || state.vault.subjectKey,
+            text: o.text,
+            done: false,
+            date: today
+          }));
+        }
+        if (Array.isArray(plan.weeklyGoals) && plan.weeklyGoals.length) {
+          state.profile.weeklyGoals = plan.weeklyGoals.map((w, i) => ({
+            id: `wk_${Date.now()}_${i}`,
+            text: w.text,
+            targetDate: w.targetDate || "",
+            done: false
+          }));
+        }
+        state.profile.lastDailyCheckInDate = today;
+        await saveProfileToRTDB();
+        appendChat("model", `**ADAPTIVE PLAN UPDATED**\n${plan.summaryReply}`, "PLAN");
+        speakMentor(plan.summaryReply);
+        showToast("Daily Objectives & Weekly Aims updated!", "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        setAiBusy(false);
+        el.generatePlanBtn.disabled = false;
+      }
+    }
+
+    async function triggerEmergencyOffRebalance() {
+      const reason = prompt("Emergency off-day / reduced hours? (e.g. 'Sick today, 0 hrs' or 'Family emergency, only 2 hrs left'):", "Emergency off today, 0 study hours");
+      if (!reason) return;
+      const today = getTodayDateStr();
+      if (!state.profile.emergencyOffDays.includes(today)) {
+        state.profile.emergencyOffDays.push(today);
+      }
+      await saveProfileToRTDB();
+      if (window.innerWidth < 1024) switchTab("mentor");
+      await generateOrRebalancePlan(
+        `EMERGENCY OFF-DAY TRIGGERED (${today}): "${reason}". Rebalance my entire remaining timeline across ALL upcoming exams without panic—compress low-yield items, protect high-yield Prof PYQs, and give me adjusted realistic Daily Objectives (for today/tomorrow) and updated Weekly Aims.`
+      );
+    }
+
+    async function runProactiveDailyBriefingIfNeeded() {
+      if (!state.user || !state.geminiKey || state.isAiBusy) return;
+      const today = getTodayDateStr();
+      if (state.profile.lastDailyCheckInDate === today) return;
+
+      const unfinishedPrev = (state.profile.dailyObjectives || []).filter(o => !o.done && o.date && o.date !== today);
+      state.profile.lastDailyCheckInDate = today;
+      await saveProfileToRTDB();
+
+      setAiBusy(true);
+      try {
+        const promptText = unfinishedPrev.length
+          ? `New day (${today}). Yesterday I left ${unfinishedPrev.length} objective(s) unfinished: ${unfinishedPrev.map(x => x.text).join("; ")}. Ask me directly about my progress and propose my top priority for today based on my nearest upcoming exam.`
+          : `New day (${today}). Give me a crisp 3-line morning briefing based on my nearest upcoming exam and ask what my first 45-minute block will be.`;
+
+        const reply = await callGemini({
+          contents: [{ role: "user", parts: [{ text: promptText }] }],
+          systemInstruction: { parts: [{ text: buildCommanderContext() }] }
+        });
+        appendChat("model", `**DAILY PROGRESS CHECK-IN (${today})**\n${reply}`, "CHECK-IN");
+        if (window.innerWidth < 1024) el.mobileMentorBadge.classList.remove("hidden");
+        speakMentor(`Daily check-in. ${reply}`);
+      } catch (_) {}
+      finally { setAiBusy(false); }
+    }
+
+    function checkIdleTimeLimitProactive() {
+      if (!state.user || state.isAiBusy || state.timer.isRunning || state.alarmRinging) return;
+      const hr = new Date().getHours();
+      if (hr < 5 || hr >= 23) return;
+      if (Date.now() - state.lastActivityMs < IDLE_CHECKIN_MS) return;
+
+      state.lastActivityMs = Date.now();
+      const pendingCount = (state.profile.dailyObjectives || []).filter(o => !o.done).length;
+      const nextExam = getNearestUpcomingExam();
+      const examHint = nextExam ? `${nextExam.subject} is in ${Math.max(0, daysUntil(nextExam.date))}d.` : "";
+      const msg = `**60-MINUTE PROGRESS CHECK-IN**\n${examHint} You still have **${pendingCount} pending objective(s)** today and no active timer.\nReply with what you just finished, or tap **Start** on your next 45-minute block.`;
+      appendChat("model", msg, "PING");
+      playTacticalChime();
+      showToast("60m Progress Check-In from APEX Commander!", "warning");
+      if (window.innerWidth < 1024) el.mobileMentorBadge.classList.remove("hidden");
+      speakMentor(`60 minutes passed. Report your progress or start your next block.`);
+    }
+
+    // =========================================================================
+    // 8. 4-STEP PROGRESSIVE MENTOR LOOP
     // =========================================================================
     async function prescribeNextMission() {
       if (state.isAiBusy) return;
+      state.lastActivityMs = Date.now();
       ensureAudioCtx();
       setAiBusy(true);
       el.prescribeMissionBtn.disabled = true;
 
       try {
         const raw = await callGemini({
-          contents: [{ role: "user", parts: [{ text: "Respect my Upcoming Exam Date Sheet and Focus Override first. Analyze all raw Prof PYQs and MedPYQ PG stems in the vault context to prescribe ONE direct high-yield study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
+          contents: [{ role: "user", parts: [{ text: "Respect my Upcoming Exam Date Sheet, Daily Objectives, and Focus Override first. Analyze all raw Prof PYQs and MedPYQ PG stems in the vault context to prescribe ONE direct high-yield study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
           systemInstruction: { parts: [{ text: buildCommanderContext() }] },
           generationConfig: {
             responseMimeType: "application/json",
@@ -1341,6 +1527,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     async function triggerTestPhase() {
+      state.lastActivityMs = Date.now();
       stopTimerInterval();
       state.timer.isRunning = false;
       updateTimerUI();
@@ -1455,6 +1642,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     async function completeMissionLoop(score) {
+      state.lastActivityMs = Date.now();
       const elapsedSec = (state.timer.durationMinutes * 60) - state.timer.remainingSeconds;
       const loggedMins = elapsedSec > 60 ? Math.round(elapsedSec / 60) : state.activeMission.durationMinutes;
       const xpEarned = Math.round(loggedMins * 1.2 + score * 5);
@@ -1474,11 +1662,9 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     async function triggerMedPYQBridgeQuiz() {
+      state.lastActivityMs = Date.now();
       const allPG = Object.values(state.vault.pgCache || {});
-      if (!allPG.length) {
-        promptMedPYQSignIn();
-        return;
-      }
+      if (!allPG.length) { promptMedPYQSignIn(); return; }
       if (window.innerWidth < 1024) switchTab("mentor");
       setAiBusy(true);
       const shuffled = [...allPG].sort(() => 0.5 - Math.random()).slice(0, 3);
@@ -1501,7 +1687,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 8. CRUD (RTDB: admin_private/apex_mentor/*)
+    // 9. CRUD (RTDB: admin_private/apex_mentor/*)
     // =========================================================================
     async function awardXP(amount, reason = "") {
       state.profile.xp = (state.profile.xp || 0) + amount;
@@ -1524,6 +1710,15 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     async function deleteExamEntry(id) {
       state.profile.examSchedule = (state.profile.examSchedule || []).filter(e => e.id !== id);
       await saveProfileToRTDB();
+    }
+
+    async function toggleDailyObjective(id) {
+      const obj = (state.profile.dailyObjectives || []).find(o => o.id === id);
+      if (!obj) return;
+      obj.done = !obj.done;
+      state.lastActivityMs = Date.now();
+      if (obj.done) await awardXP(10, `Objective completed`);
+      else await saveProfileToRTDB();
     }
 
     async function addSyllabusTopic(subject, topic, mastery) {
@@ -1600,7 +1795,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 9. AUDIO, WAKE LOCK, TIMER & ALARM
+    // 10. AUDIO, WAKE LOCK, TIMER & ALARM
     // =========================================================================
     let audioCtx = null, sirenInterval = null, sirenStep = 0;
     function ensureAudioCtx() {
@@ -1702,6 +1897,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
     function stopTimerInterval() { if (state.timer.intervalId) { clearInterval(state.timer.intervalId); state.timer.intervalId = null; } }
     function startTimer() {
+      state.lastActivityMs = Date.now();
       ensureAudioCtx();
       if (state.timer.remainingSeconds <= 0) state.timer.remainingSeconds = state.timer.durationMinutes * 60;
       state.timer.isRunning = true;
@@ -1744,9 +1940,9 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 10. RENDERERS
+    // 11. RENDERERS
     // =========================================================================
-    function renderAllUI() { renderHUD(); renderExamSchedule(); renderMissionCard(); updateTimerUI(); renderAlarmSettings(); renderSyllabus(); renderDueBookmarks(); renderMistakes(); renderAnalytics(); renderChat(); }
+    function renderAllUI() { renderHUD(); renderExamSchedule(); renderObjectivesPanel(); renderMissionCard(); updateTimerUI(); renderAlarmSettings(); renderSyllabus(); renderDueBookmarks(); renderMistakes(); renderAnalytics(); renderChat(); }
 
     function renderHUD() {
       const nextExam = getNearestUpcomingExam();
@@ -1758,7 +1954,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       } else {
         const d = Math.max(0, daysUntil(state.profile.examDate || "2026-12-04"));
         el.hudNextExamLabel.textContent = "PROFS";
-        el.examDaysLeft.textContent = `${d}d LEFT`;
+        el.examDaysLeft.textContent = d === 999 ? "--d" : `${d}d LEFT`;
         el.examTargetDateLabel.textContent = state.profile.examDate || "Set Schedule";
       }
 
@@ -1788,7 +1984,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       };
 
       if (!list.length) {
-        el.examScheduleTimeline.innerHTML = `<div class="col-span-full text-xs text-zinc-500 py-3 text-center border border-dashed border-zinc-800 rounded-xl">No exams in schedule yet. Paste your date sheet in Gemini chat or tap "+ Edit / Add Exams".</div>`;
+        el.examScheduleTimeline.innerHTML = `<div class="col-span-full text-xs text-zinc-500 py-3 text-center border border-dashed border-zinc-800 rounded-xl">No exams in schedule yet. Paste your date sheet in chat or tap "+ Edit / Add Exams".</div>`;
       } else {
         el.examScheduleTimeline.innerHTML = list.map(e => {
           const d = daysUntil(e.date);
@@ -1820,7 +2016,6 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
         });
       }
 
-      // Also render the editable list inside Exam Schedule Modal
       el.scheduleModalList.innerHTML = list.length ? list.map(e => `
         <div class="bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
           <div class="min-w-0">
@@ -1830,6 +2025,33 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
           <button type="button" data-del-exam="${e.id}" class="del-exam-btn px-2 py-1 text-xs text-zinc-500 hover:text-rose-400 font-bold">✕</button>
         </div>`).join("") : `<div class="text-xs text-zinc-500 text-center py-4">No exams added yet.</div>`;
       el.scheduleModalList.querySelectorAll(".del-exam-btn").forEach(b => b.addEventListener("click", () => deleteExamEntry(b.dataset.delExam)));
+    }
+
+    function renderObjectivesPanel() {
+      const objs = state.profile.dailyObjectives || [];
+      const doneCount = objs.filter(o => o.done).length;
+      el.objectivesProgressSummary.textContent = objs.length ? `${doneCount}/${objs.length} daily objectives completed` : "Tap 'Build / Rebalance Plan' to generate today's targets";
+
+      if (!objs.length) {
+        el.dailyObjectivesList.innerHTML = `<div class="text-xs text-zinc-500 py-2.5 text-center border border-dashed border-zinc-800 rounded-xl">No daily objectives yet.</div>`;
+      } else {
+        el.dailyObjectivesList.innerHTML = objs.map(o => `
+          <label class="flex items-start gap-2.5 bg-zinc-950 border ${o.done ? "border-emerald-500/30 opacity-65" : "border-zinc-800"} rounded-xl px-3 py-2 cursor-pointer">
+            <input type="checkbox" data-obj-id="${o.id}" ${o.done ? "checked" : ""} class="obj-chk mt-0.5 accent-emerald-500 w-4 h-4 shrink-0" />
+            <div class="min-w-0 text-xs leading-snug ${o.done ? "line-through text-zinc-400" : "text-zinc-100"}">
+              <span class="font-black text-amber-300 mr-1">[${escapeHtml(o.subject || "PYQ")}]</span>${escapeHtml(o.text)}
+            </div>
+          </label>`).join("");
+        el.dailyObjectivesList.querySelectorAll(".obj-chk").forEach(c => c.addEventListener("change", () => toggleDailyObjective(c.dataset.objId)));
+      }
+
+      const weeks = state.profile.weeklyGoals || [];
+      el.weeklyGoalsContainer.classList.toggle("hidden", !weeks.length);
+      el.weeklyGoalsList.innerHTML = weeks.map(w => `
+        <div class="text-xs text-zinc-300 flex items-center justify-between gap-2 bg-zinc-950/60 px-2.5 py-1.5 rounded-lg border border-zinc-800/70">
+          <span>▸ ${escapeHtml(w.text)}</span>
+          ${w.targetDate ? `<span class="text-[10px] font-mono text-indigo-300 shrink-0">${escapeHtml(w.targetDate)}</span>` : ""}
+        </div>`).join("");
     }
 
     function renderMissionCard() {
@@ -1987,11 +2209,12 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 11. AGENTIC CHAT ROUTER (Updates Full Exam Schedule, Focus & Mission)
+    // 12. AGENTIC CHAT ROUTER (Updates Schedule, Objectives, Weekly & Off-Days)
     // =========================================================================
     async function handleChatSubmit(rawText) {
       const text = rawText.trim();
       if (!text || state.isAiBusy) return;
+      state.lastActivityMs = Date.now();
       ensureAudioCtx();
       el.chatInput.value = ""; el.chatInput.style.height = "auto";
       appendChat("user", text);
@@ -2009,7 +2232,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
           systemInstruction: {
             parts: [{
               text: buildCommanderContext() +
-                `\nIf the student shares a full date sheet, adds/edits/postpones an exam, or asks to focus on a topic right now, populate scheduleAction + scheduleItems (use YYYY-MM-DD dates; split multi-day exams like Dec 4-5 into separate entries for Paper 1 and Paper 2) and/or focusOverride + newMissionTopic. Otherwise leave update fields empty.`
+                `\nIf the student shares a date sheet, edits/adds/deletes an exam, reports an emergency off-day, asks for daily/weekly objectives, or asks to focus on a topic, populate the corresponding structured fields so the app updates immediately. Otherwise leave update fields empty.`
             }]
           },
           generationConfig: {
@@ -2026,10 +2249,27 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
                     properties: {
                       subject: { type: "STRING" },
                       paper: { type: "STRING" },
-                      type: { type: "STRING", description: "Theory | Practical | PG" },
-                      date: { type: "STRING", description: "YYYY-MM-DD" }
+                      type: { type: "STRING" },
+                      date: { type: "STRING" }
                     },
                     required: ["subject", "date"]
+                  }
+                },
+                logEmergencyOffToday: { type: "BOOLEAN" },
+                dailyObjectives: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: { subject: { type: "STRING" }, text: { type: "STRING" } },
+                    required: ["subject", "text"]
+                  }
+                },
+                weeklyGoals: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: { text: { type: "STRING" }, targetDate: { type: "STRING" } },
+                    required: ["text"]
                   }
                 },
                 focusOverride: { type: "STRING" },
@@ -2047,17 +2287,14 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
         try { parsed = safeParseJSON(raw); } catch (_) { parsed = { reply: raw }; }
 
         const updatedNotes = [];
+        const today = getTodayDateStr();
         const validItems = (parsed.scheduleItems || []).filter(x => x && x.subject && /^\d{4}-\d{2}-\d{2}$/.test(x.date));
 
         if (parsed.scheduleAction === "replace_all" && validItems.length) {
           state.profile.examSchedule = validItems.map((x, i) => ({
-            id: `ex_${Date.now()}_${i}`,
-            subject: x.subject.trim(),
-            paper: (x.paper || "").trim(),
-            type: x.type || "Theory",
-            date: x.date
+            id: `ex_${Date.now()}_${i}`, subject: x.subject.trim(), paper: (x.paper || "").trim(), type: x.type || "Theory", date: x.date
           }));
-          updatedNotes.push(`Date Sheet updated (${validItems.length} exams)`);
+          updatedNotes.push(`Date Sheet (${validItems.length} exams)`);
         } else if (parsed.scheduleAction === "upsert" && validItems.length) {
           validItems.forEach((x, i) => {
             const idx = state.profile.examSchedule.findIndex(e =>
@@ -2078,6 +2315,22 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
           updatedNotes.push("Removed exam(s)");
         }
 
+        if (parsed.logEmergencyOffToday && !state.profile.emergencyOffDays.includes(today)) {
+          state.profile.emergencyOffDays.push(today);
+          updatedNotes.push("Emergency off logged");
+        }
+        if (Array.isArray(parsed.dailyObjectives) && parsed.dailyObjectives.length) {
+          state.profile.dailyObjectives = parsed.dailyObjectives.map((o, i) => ({
+            id: `obj_${Date.now()}_${i}`, subject: o.subject || state.vault.subjectKey, text: o.text, done: false, date: today
+          }));
+          updatedNotes.push(`${parsed.dailyObjectives.length} Daily Objectives`);
+        }
+        if (Array.isArray(parsed.weeklyGoals) && parsed.weeklyGoals.length) {
+          state.profile.weeklyGoals = parsed.weeklyGoals.map((w, i) => ({
+            id: `wk_${Date.now()}_${i}`, text: w.text, targetDate: w.targetDate || "", done: false
+          }));
+          updatedNotes.push(`${parsed.weeklyGoals.length} Weekly Aims`);
+        }
         if (parsed.focusOverride) {
           state.profile.focusOverride = parsed.focusOverride;
           updatedNotes.push(`Focus → ${parsed.focusOverride}`);
@@ -2085,11 +2338,9 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
         if (parsed.newMissionTopic) {
           const dur = Math.max(15, Math.min(90, parsed.newMissionDuration || 45));
           state.activeMission = {
-            id: Date.now().toString(),
-            qid: "",
+            id: Date.now().toString(), qid: "",
             subject: parsed.newMissionSubject || state.vault.subjectKey,
-            topic: parsed.newMissionTopic,
-            durationMinutes: dur,
+            topic: parsed.newMissionTopic, durationMinutes: dur,
             deliverable: parsed.newMissionDeliverable || `Master ${parsed.newMissionTopic} based on your PYQ vault.`,
             stage: "STUDY"
           };
@@ -2135,7 +2386,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 12. EVENT BINDINGS & BOOT
+    // 13. EVENT BINDINGS & BOOT
     // =========================================================================
     el.loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -2158,6 +2409,9 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
 
     el.connectMedpyqBtn.addEventListener("click", promptMedPYQSignIn);
     el.quickMedpyqAuthBtn.addEventListener("click", promptMedPYQSignIn);
+
+    el.generatePlanBtn.addEventListener("click", () => generateOrRebalancePlan(""));
+    el.emergencyOffBtn.addEventListener("click", triggerEmergencyOffRebalance);
 
     el.openScheduleModalBtn.addEventListener("click", () => el.examScheduleModal.classList.remove("hidden"));
     el.examCountdownBtn.addEventListener("click", () => el.examScheduleModal.classList.remove("hidden"));
@@ -2261,6 +2515,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     el.chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleChatSubmit(el.chatInput.value); } });
     el.quickChips.forEach(c => c.addEventListener("click", () => handleChatSubmit(c.dataset.quick)));
 
+    // Live Clock + Alarm + Proactive 60-Min Idle Check-In
     setInterval(() => {
       const now = new Date();
       el.liveClockDisplay.textContent = `Now: ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
@@ -2268,10 +2523,11 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       if (state.profile.alarmArmed && hhmm === state.profile.wakeUpTime && state.alarmTriggeredMinute !== hhmm) {
         state.alarmTriggeredMinute = hhmm; triggerWakeUpAlarm();
       }
+      if (now.getSeconds() === 0) checkIdleTimeLimitProactive();
     }, 1000);
 
     switchTab("command");
-    appendChat("model", "**APEX MENTOR READY.** Paste your full exam date sheet in chat to populate your live multi-exam countdown, and tap **🔒 Sign In MedPYQ** (if shown) once to unlock all NEET-PG, INI-CET, UPSC-CMS, and FMGE questions.", "ORDER");
+    appendChat("model", "**APEX MENTOR READY.** Tap **🗓️ Build / Rebalance Plan** to generate today's objectives & weekly aims from your exam date sheet, or tap **🚑 Emergency Off** anytime you need to re-plan around an off-day.", "ORDER");
   </script>
 </body>
 </html>
