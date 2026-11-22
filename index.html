@@ -67,7 +67,7 @@
       </div>
 
       <p class="text-xs text-zinc-400 mb-5 leading-relaxed">
-        Sign in with your <strong class="text-amber-300">MBBS PROFS PREP Admin</strong> email to unlock your AIIMS Prof PYQs, model answers, MedPYQ PG bridge, and synced bookmarks.
+        Sign in with your <strong class="text-amber-300">MBBS PROFS PREP Admin</strong> email to unlock all 19 AIIMS Prof subjects + all 4 MedPYQ PG exams (NEET-PG, INI-CET, UPSC-CMS, FMGE).
       </p>
 
       <form id="loginForm" class="space-y-3.5">
@@ -109,7 +109,7 @@
                 <span id="cloudSyncText">Locked</span>
               </span>
             </div>
-            <p class="text-[11px] text-zinc-400 hidden sm:block">MBBS Profs + MedPYQ Connected</p>
+            <p class="text-[11px] text-zinc-400 hidden sm:block">MBBS Profs + Full MedPYQ Direct</p>
           </div>
         </div>
 
@@ -174,7 +174,7 @@
       </div>
     </div>
 
-    <!-- Active PYQ Vault Selector Strip -->
+    <!-- Active PYQ Vault Selector Strip (All 19 Subjects) -->
     <div class="max-w-[1600px] mx-auto mt-2 flex flex-wrap items-center justify-between gap-2 bg-zinc-900/70 border border-zinc-800/80 rounded-xl px-3 py-1.5">
       <div class="flex items-center gap-2 flex-wrap">
         <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">PYQ Vault:</span>
@@ -185,19 +185,25 @@
           <option value="patna">AIIMS Patna</option>
         </select>
         <select id="vaultSubjectSelect" class="bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1 text-xs font-semibold text-amber-300 focus:outline-none focus:border-amber-500">
-          <option value="OPHTHALMOLOGY|ophthalmology">Ophthalmology</option>
-          <option value="PSM|psm">CFM / PSM</option>
-          <option value="ENT|ent">ENT</option>
-          <option value="ORTHOPAEDICS|orthopaedics">Orthopedics</option>
-          <option value="PSYCHIATRY|psychiatry">Psychiatry</option>
-          <option value="MEDICINE|medicine">Medicine</option>
-          <option value="SURGERY|surgery">Surgery</option>
-          <option value="OBG|obg">OBG</option>
-          <option value="PAEDIATRICS|paediatrics">Paediatrics</option>
-          <option value="PATHOLOGY|pathology">Pathology</option>
-          <option value="PHARMACOLOGY|pharmacology">Pharmacology</option>
-          <option value="MICROBIOLOGY|microbiology">Microbiology</option>
-          <option value="FMT|fmt">FMT</option>
+          <option value="ANATOMY|anatomy">1st Prof • Anatomy</option>
+          <option value="PHYSIOLOGY|physiology">1st Prof • Physiology</option>
+          <option value="BIOCHEMISTRY|biochemistry">1st Prof • Biochemistry</option>
+          <option value="PATHOLOGY|pathology">2nd Prof • Pathology</option>
+          <option value="PHARMACOLOGY|pharmacology">2nd Prof • Pharmacology</option>
+          <option value="MICROBIOLOGY|microbiology">2nd Prof • Microbiology</option>
+          <option value="FMT|fmt">2nd Prof • FMT</option>
+          <option value="ENT|ent">3rd Prof • ENT</option>
+          <option value="OPHTHALMOLOGY|ophthalmology" selected>3rd Prof • Ophthalmology</option>
+          <option value="CFM|cfm">3rd Prof • Community Medicine (CFM)</option>
+          <option value="PSYCHIATRY|psychiatry">3rd Prof • Psychiatry</option>
+          <option value="ORTHOPAEDICS|orthopaedics">3rd Prof • Orthopaedics</option>
+          <option value="MEDICINE|medicine">Final Prof • Medicine</option>
+          <option value="SURGERY|surgery">Final Prof • Surgery</option>
+          <option value="OBG|obg">Final Prof • OBG</option>
+          <option value="PAEDIATRICS|paediatrics">Final Prof • Paediatrics</option>
+          <option value="DERMATOLOGY|dermatology">Final Prof • Dermatology</option>
+          <option value="ANAESTHESIA|anaesthesia">Final Prof • Anaesthesia</option>
+          <option value="RADIOLOGY|radiology">Final Prof • Radiology</option>
         </select>
         <button id="syncVaultBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition active:scale-95">
           Sync PYQs
@@ -267,8 +273,8 @@
               <h2 id="missionTopicTitle" class="text-lg sm:text-xl font-extrabold text-white mt-0.5">No Mission Assigned Yet</h2>
             </div>
             <div class="flex items-center gap-2">
-              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95" title="Quiz 3 MedPYQ PG stems for current subject">
-                MedPYQ PG Bridge
+              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95" title="Quiz 3 MedPYQ PG stems (NEET-PG / INI-CET / CMS / FMGE)">
+                MedPYQ PG Drill
               </button>
               <button id="prescribeMissionBtn" type="button" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 shadow-lg shadow-amber-500/20 transition active:scale-95">
                 ⚡ Prescribe Mission
@@ -499,7 +505,7 @@
 
       <div class="p-3 border-t border-zinc-800 bg-zinc-950/90">
         <div class="flex flex-wrap gap-1.5 mb-2.5">
-          <button type="button" data-quick="Analyze all Prof PYQs and MedPYQ stems in this subject and list the top 5 highest-yield topics I must master first." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">High-Yield Analysis</button>
+          <button type="button" data-quick="Analyze all Prof PYQs and MedPYQ stems (NEET-PG, INI-CET, CMS, FMGE) in this subject and list the top 5 highest-yield topics I must master first." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">High-Yield Analysis</button>
           <button type="button" data-quick="Give me a 10-mark Prof answer skeleton (headings + diagram + viva traps) for my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">10-Mark Skeleton</button>
           <button type="button" data-quick="Test me with 3 rapid-fire high-yield PYQs on my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-rose-500/20 hover:text-rose-300 text-zinc-300 border border-zinc-800 transition">Quiz Me Now</button>
         </div>
@@ -540,6 +546,13 @@
             <option value="gemini-4-hydrogen">gemini-4-hydrogen (Latest Gen)</option>
             <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Legacy API)</option>
           </select>
+        </div>
+        <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-2">
+          <div>
+            <div class="text-[11px] font-bold text-zinc-200">MedPYQ Direct Vault Auth</div>
+            <div id="medpyqAuthStatusText" class="text-[10px] text-zinc-400">Checking MedPYQ session...</div>
+          </div>
+          <button id="connectMedpyqBtn" type="button" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40">Sign In</button>
         </div>
       </div>
 
@@ -595,7 +608,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION LOGIC (Firebase v11 RTDB + IndexedDB PYQ Cache + Gemini)  -->
+  <!-- APPLICATION LOGIC (Dual Firebase RTDB + IndexedDB + 2026 Gemini)      -->
   <!-- ===================================================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -612,6 +625,13 @@
       appId: "1:378639777472:web:9c2dcb689d97025f6ff725"
     };
 
+    const MEDPYQ_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAp8tKgVyc6PC-yt0Nv4nOOtH8B8jCaSYE",
+      authDomain: "medpyq-elearning.firebaseapp.com",
+      databaseURL: "https://medpyq-elearning-default-rtdb.firebaseio.com",
+      projectId: "medpyq-elearning"
+    };
+
     const ADMIN_EMAILS = [
       "pankajmahto109@gmail.com",
       "educateindiainstitute@gmail.com",
@@ -619,34 +639,47 @@
     ];
 
     const SUBJECT_ALIASES = {
-      OPHTHALMOLOGY: ["OPHTHAL", "OPHTHALMOLOGY", "ophthal", "ophthalmology"],
-      PSM: ["CFM", "PSM", "cfm", "psm"],
+      ANATOMY: ["ANATOMY", "anatomy", "ANAT", "anat"],
+      PHYSIOLOGY: ["PHYSIOLOGY", "physiology", "PHYSIO", "physio"],
+      BIOCHEMISTRY: ["BIOCHEMISTRY", "biochemistry", "BIOCHEM", "biochem"],
+      PATHOLOGY: ["PATHOLOGY", "pathology", "PATHO", "patho"],
+      PHARMACOLOGY: ["PHARMACOLOGY", "pharmacology", "PHARMA", "pharma"],
+      MICROBIOLOGY: ["MICROBIOLOGY", "microbiology", "MICRO", "micro"],
+      FMT: ["FMT", "fmt", "FORENSIC", "forensic"],
       ENT: ["ENT", "ent"],
-      ORTHOPAEDICS: ["ORTHOPAEDICS", "ORTHOPEDICS", "ORTHO", "orthopaedics", "ortho"],
-      PSYCHIATRY: ["PSYCHIATRY", "PSYCH", "psychiatry"],
-      MEDICINE: ["MEDICINE", "MED", "medicine"],
-      SURGERY: ["SURGERY", "SURG", "surgery"],
-      OBG: ["OBG", "OBGYN", "obg"],
-      PAEDIATRICS: ["PAEDIATRICS", "PEDIATRICS", "PAEDS", "paediatrics", "pediatrics"],
-      PATHOLOGY: ["PATHOLOGY", "PATHO", "pathology", "patho"],
-      PHARMACOLOGY: ["PHARMACOLOGY", "PHARMA", "pharmacology", "pharma"],
-      MICROBIOLOGY: ["MICROBIOLOGY", "MICRO", "microbiology", "micro"],
-      FMT: ["FMT", "fmt"]
+      OPHTHALMOLOGY: ["OPHTHAL", "ophthal", "OPHTHALMOLOGY", "ophthalmology"],
+      CFM: ["CFM", "cfm", "PSM", "psm"],
+      PSYCHIATRY: ["PSYCHIATRY", "psychiatry", "PSYCH", "psych"],
+      ORTHOPAEDICS: ["ORTHOPAEDICS", "orthopaedics", "ORTHO", "ortho", "ORTHOPEDICS"],
+      MEDICINE: ["MEDICINE", "medicine", "MED", "med"],
+      SURGERY: ["SURGERY", "surgery", "SURG", "surg"],
+      OBG: ["OBG", "obg"],
+      PAEDIATRICS: ["PAEDIATRICS", "paediatrics", "PEDIATRICS", "pediatrics", "PEDS", "peds"],
+      DERMATOLOGY: ["DERMATOLOGY", "dermatology", "DERMA", "derma"],
+      ANAESTHESIA: ["ANAESTHESIA", "anaesthesia", "ANESTHESIA", "anesthesia"],
+      RADIOLOGY: ["RADIOLOGY", "radiology", "RADIO", "radio"]
     };
 
     const COMMITMENT_PHRASE = "I am awake and starting now";
-    const IDB_NAME = "ApexMentorPYQCache_v3";
+    const IDB_NAME = "ApexMentorPYQCache_v4";
     const IDB_STORE = "vaults";
 
+    // Primary App: MBBS PROFS PREP
     const app = initializeApp(PROFS_FIREBASE_CONFIG);
     const auth = getAuth(app);
     const db = getDatabase(app);
+
+    // Secondary App: MedPYQ Direct (All NEET-PG, INI-CET, UPSC-CMS & FMGE Qs)
+    const medpyqApp = initializeApp(MEDPYQ_FIREBASE_CONFIG, "MedPYQVault");
+    const medpyqAuth = getAuth(medpyqApp);
+    const medpyqDb = getDatabase(medpyqApp);
 
     // =========================================================================
     // 1. STATE
     // =========================================================================
     const state = {
       user: null,
+      medpyqUser: null,
       geminiKey: localStorage.getItem("apex_gemini_key") || "",
       geminiModel: localStorage.getItem("apex_gemini_model") || "gemini-3.5-flash-lite",
       vault: {
@@ -657,6 +690,7 @@
         qnaData: [],
         curriculumData: [],
         pgCache: {},
+        pgCounts: { "neet-pg": 0, inicet: 0, "upsc-cms": 0, fmge: 0 },
         loaded: false
       },
       bookmarks: {},
@@ -737,6 +771,7 @@
       quickChips: document.querySelectorAll(".quick-chip"),
       settingsModal: $("settingsModal"), closeSettingsBtn: $("closeSettingsBtn"),
       settingsGeminiKey: $("settingsGeminiKey"), settingsGeminiModel: $("settingsGeminiModel"),
+      medpyqAuthStatusText: $("medpyqAuthStatusText"), connectMedpyqBtn: $("connectMedpyqBtn"),
       saveSettingsBtn: $("saveSettingsBtn"), clearCacheBtn: $("clearCacheBtn"), logoutBtn: $("logoutBtn"),
       examDateModal: $("examDateModal"), examDatePicker: $("examDatePicker"),
       cancelExamDateBtn: $("cancelExamDateBtn"), saveExamDateBtn: $("saveExamDateBtn"),
@@ -827,7 +862,7 @@
     }
 
     // =========================================================================
-    // 4. OWNER-ONLY AUTH + RTDB SYNC (admin_private/apex_mentor)
+    // 4. OWNER-ONLY AUTH + MEDPYQ DIRECT AUTH + RTDB SYNC
     // =========================================================================
     function setCloudBadge(status, label) {
       const dots = {
@@ -838,6 +873,13 @@
       el.cloudSyncDot.className = `w-1.5 h-1.5 rounded-full ${dots[status] || dots.offline}`;
       el.cloudSyncText.textContent = label;
     }
+
+    onAuthStateChanged(medpyqAuth, (mUser) => {
+      state.medpyqUser = mUser || null;
+      if (el.medpyqAuthStatusText) {
+        el.medpyqAuthStatusText.textContent = mUser ? `Connected (${mUser.email})` : "Not signed in (click Sign In if MedPYQ shows 0)";
+      }
+    });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user || !ADMIN_EMAILS.includes((user.email || "").toLowerCase().trim())) {
@@ -902,7 +944,7 @@
     }
 
     // =========================================================================
-    // 5. MBBS PROFS PREP + MEDPYQ BRIDGE LOADER (No Teen Patti Dependency)
+    // 5. FULL 19-SUBJECT PROFS + ALL 4 MEDPYQ EXAMS LOADER (Zero Teen Patti)
     // =========================================================================
     async function loadActiveSubjectVault(forceRefresh = false) {
       if (!state.user) return;
@@ -913,7 +955,7 @@
       state.vault.college = college;
       state.vault.subjectKey = subjectKey;
       state.vault.bridgeSlug = bridgeSlug;
-      el.vaultStatusText.textContent = `Loading ${college.toUpperCase()} / ${subjectKey}...`;
+      el.vaultStatusText.textContent = `Loading ${college.toUpperCase()} / ${subjectKey} + All 4 MedPYQ Exams...`;
 
       try {
         let matchedKey = aliases[0];
@@ -923,22 +965,23 @@
           if (mSnap && mSnap.exists()) { matchedKey = k; remoteVer = Number(mSnap.val() || 1); break; }
         }
 
-        const cacheKey = `vault_${college}_${subjectKey}`;
-        let cached = !forceRefresh ? await idbGet(cacheKey) : null;
-        let bank = null, pgCache = null;
+        const cacheKey = `full_vault_v4_${college}_${subjectKey}`;
+        const cached = !forceRefresh ? await idbGet(cacheKey) : null;
+        let bank = null, pgCache = {}, pgCounts = { "neet-pg": 0, inicet: 0, "upsc-cms": 0, fmge: 0 };
 
-        if (cached && cached.ver === remoteVer && cached.bank?.qnaData?.length) {
+        if (cached && cached.ver === remoteVer && (cached.bank?.qnaData?.length || Object.keys(cached.pgCache || {}).length)) {
           bank = cached.bank;
           pgCache = cached.pgCache || {};
+          pgCounts = cached.pgCounts || pgCounts;
           matchedKey = cached.matchedKey || matchedKey;
         } else {
-          // 1. Try RTDB question_banks across all aliases
+          // 1. Pull ALL Prof PYQs from mbbs-profs-prep48c RTDB
           for (const k of [matchedKey, ...aliases.filter(a => a !== matchedKey)]) {
             const bSnap = await get(ref(db, `question_banks/${college}/${k}`)).catch(() => null);
             if (bSnap && bSnap.exists()) { bank = bSnap.val(); matchedKey = k; break; }
           }
 
-          // 2. Fallback to static GitHub JSON on mbbsprofsprep.github.io
+          // 2. Fallback to static GitHub JSON files on mbbsprofsprep.github.io
           if (!bank) {
             for (const k of aliases) {
               try {
@@ -948,22 +991,46 @@
             }
           }
 
-          // 3. Pull ONLY MedPYQ shared_q_cache from bridge (skips Teen Patti clusters/history)
-          const pgSnap = await get(ref(db, `cross_links/${bridgeSlug}/shared_q_cache`)).catch(() => null);
-          pgCache = pgSnap?.val() || {};
+          // 3. Pull 100% of ALL 4 MedPYQ PG exams directly from medpyq-elearning
+          const pgExams = [
+            { key: "neet-pg", pfx: "N", label: "NEET-PG" },
+            { key: "inicet", pfx: "IN", label: "INI-CET" },
+            { key: "upsc-cms", pfx: "CMS", label: "UPSC-CMS" },
+            { key: "fmge", pfx: "F", label: "FMGE" }
+          ];
+          await Promise.all(pgExams.map(async ({ key: ex, pfx, label }) => {
+            const snap = await get(ref(medpyqDb, `question_banks/${ex}/${bridgeSlug}`)).catch(() => null);
+            if (!snap || !snap.exists()) return;
+            const raw = snap.val();
+            const arr = (Array.isArray(raw) ? raw : Object.values(raw || {})).filter(Boolean);
+            pgCounts[ex] = arr.length;
+            arr.forEach((item, idx) => {
+              const qid = String(item.q || `${pfx}${idx + 1}`).trim();
+              pgCache[`${ex}_${qid}`] = {
+                q: qid,
+                exam: `${label} ${item.year_paper || ""}`.trim(),
+                topic: Array.isArray(item.topic) ? item.topic.join(", ") : (item.topic || ""),
+                stem: String(item.stem || ""),
+                options: Array.isArray(item.options) ? item.options.map(String) : [],
+                ans_key: String(item.ans_key || "")
+              };
+            });
+          }));
+
           bank = bank || {};
-          await idbSet(cacheKey, { ver: remoteVer, matchedKey, bank, pgCache });
+          await idbSet(cacheKey, { ver: remoteVer, matchedKey, bank, pgCache, pgCounts });
         }
 
         const qnaData = Array.isArray(bank) ? bank : (Array.isArray(bank.qnaData) ? bank.qnaData : Object.values(bank.qnaData || {}));
         const curriculumData = Array.isArray(bank.curriculumData) ? bank.curriculumData : Object.values(bank.curriculumData || {});
 
-        state.vault = { ...state.vault, matchedKey, qnaData, curriculumData, pgCache, loaded: true };
+        state.vault = { ...state.vault, matchedKey, qnaData, curriculumData, pgCache, pgCounts, loaded: true };
         await mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData);
 
-        const pgCount = Object.keys(pgCache).length;
-        el.vaultStatusText.textContent = `✓ ${qnaData.length} Prof PYQs (${matchedKey}) • ${pgCount} MedPYQ Bridge Stems`;
-        showToast(`Loaded ${qnaData.length} Prof PYQs (${matchedKey})`, "success");
+        const totalPG = Object.keys(pgCache).length;
+        el.vaultStatusText.textContent =
+          `✓ ${qnaData.length} Prof (${matchedKey}) • ${totalPG} MedPYQ [NEET:${pgCounts["neet-pg"]} | INI:${pgCounts.inicet} | CMS:${pgCounts["upsc-cms"]} | FMGE:${pgCounts.fmge}]`;
+        showToast(`Synced ${qnaData.length} Prof + ${totalPG} MedPYQ questions`, "success");
       } catch (err) {
         el.vaultStatusText.textContent = `Error loading ${subjectKey}`;
         showToast(`Vault load failed: ${err.message}`, "error");
@@ -1000,10 +1067,9 @@
     }
 
     function buildSubjectPYQPromptContext(chapterFilter = "") {
-      const { subjectKey, qnaData, pgCache } = state.vault;
-      if (!qnaData.length) return "No PYQ bank loaded yet.";
+      const { subjectKey, qnaData, pgCache, pgCounts } = state.vault;
+      if (!qnaData.length && !Object.keys(pgCache).length) return "No PYQ bank loaded yet.";
 
-      // Chapter-wise PYQ distribution so AI sees the entire subject weightage
       const chCounts = {};
       qnaData.forEach(q => {
         const chs = Array.isArray(q.chapter) ? q.chapter : [q.chapter || "General"];
@@ -1025,19 +1091,25 @@
           key: q.ans_key || ""
         }));
 
-      const topTheory = filtered.filter(x => x.type !== "MCQ").slice(0, 18);
-      const topMcq = filtered.filter(x => x.type === "MCQ").slice(0, 10);
-      const topPG = Object.entries(pgCache).slice(0, 8).map(([qid, obj]) =>
-        `- [${qid} | ${obj.exam || "MedPYQ"} | Key:${obj.ans_key || ""}] ${stripHtml(obj.stem).slice(0, 150)}`
+      const topTheory = filtered.filter(x => x.type !== "MCQ").slice(0, 16);
+      const topMcq = filtered.filter(x => x.type === "MCQ").slice(0, 8);
+
+      const allPG = Object.values(pgCache || {});
+      const matchingPG = chapterFilter
+        ? allPG.filter(p => (p.topic + " " + p.stem).toLowerCase().includes(chapterFilter.toLowerCase()))
+        : allPG;
+      const topPG = (matchingPG.length ? matchingPG : allPG).slice(0, 10).map(p =>
+        `- [${p.q} | ${p.exam} | ${p.topic || "PG"} | Key:${p.ans_key}] ${stripHtml(p.stem).slice(0, 150)}`
       );
 
       return [
-        `CHAPTER PYQ DISTRIBUTION (${subjectKey}): ${chapterSummary}`,
+        `CHAPTER PYQ DISTRIBUTION (${subjectKey}): ${chapterSummary || "N/A"}`,
+        `MEDPYQ TOTALS: NEET-PG=${pgCounts["neet-pg"]}, INI-CET=${pgCounts.inicet}, UPSC-CMS=${pgCounts["upsc-cms"]}, FMGE=${pgCounts.fmge}`,
         `PROF THEORY PYQs (${chapterFilter || "All Chapters"}):`,
         ...topTheory.map(q => `- [${q.id} | ${q.batch}] ${q.stem}`),
         `PROF MCQs:`,
         ...topMcq.map(q => `- [${q.id} | Key:${q.key}] ${q.stem}`),
-        topPG.length ? `MEDPYQ BRIDGE PG STEMS:\n${topPG.join("\n")}` : ""
+        topPG.length ? `MEDPYQ PG STEMS (NEET-PG / INI-CET / CMS / FMGE):\n${topPG.join("\n")}` : ""
       ].join("\n");
     }
 
@@ -1089,8 +1161,8 @@
         .map(t => `${t.topic} (${t.mastery}%, ${t.pyqCount || 0} PYQs)`)
         .join("; ") || "None";
 
-      return `You are APEX MENTOR — a direct, tactical study commander for a 3rd-year MBBS student preparing for Profs (Next Exam: ${state.profile.examDate}) and INI-CET/NEET-PG.
-Analyze the raw Prof PYQs + MedPYQ bridge stems below yourself to identify high-yield topics—never rely on manual link counts.
+      return `You are APEX MENTOR — a direct, tactical study commander for a 3rd-year MBBS student preparing for Profs (Next Exam: ${state.profile.examDate}) and INI-CET/NEET-PG/CMS/FMGE.
+Analyze the raw Prof PYQs + full MedPYQ PG stems below yourself to identify high-yield topics—never rely on manual link counts.
 
 STUDENT DIRECTIVES (HIGHEST PRIORITY — ALWAYS OBEY):
 - Exam Date Sheet: ${state.profile.dateSheet || "Not set yet"}
@@ -1117,7 +1189,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
 
       try {
         const raw = await callGemini({
-          contents: [{ role: "user", parts: [{ text: "Respect my Exam Date Sheet and Focus Override first. Analyze all raw Prof PYQs and MedPYQ bridge stems in the vault context to prescribe ONE direct high-yield study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
+          contents: [{ role: "user", parts: [{ text: "Respect my Exam Date Sheet and Focus Override first. Analyze all raw Prof PYQs and MedPYQ PG stems in the vault context to prescribe ONE direct high-yield study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
           systemInstruction: { parts: [{ text: buildCommanderContext() }] },
           generationConfig: {
             responseMimeType: "application/json",
@@ -1171,7 +1243,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       setAiBusy(true);
       try {
         const questions = await callGemini({
-          contents: [{ role: "user", parts: [{ text: `I finished my block on ${state.activeMission.subject} — ${state.activeMission.topic}. Pull 3 sharp, high-yield recall questions directly from my Prof PYQ vault context above (include their QIDs). Keep it concise.` }] }],
+          contents: [{ role: "user", parts: [{ text: `I finished my block on ${state.activeMission.subject} — ${state.activeMission.topic}. Pull 3 sharp, high-yield recall questions directly from my Prof PYQ + MedPYQ vault context above (include their QIDs). Keep it concise.` }] }],
           systemInstruction: { parts: [{ text: buildCommanderContext() }] }
         });
         state.lastTestQuestions = questions;
@@ -1292,15 +1364,16 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     async function triggerMedPYQBridgeQuiz() {
-      const pgEntries = Object.entries(state.vault.pgCache || {});
-      if (!pgEntries.length) {
-        showToast("No MedPYQ PG bridge stems cached for this subject yet.", "warning");
+      const allPG = Object.values(state.vault.pgCache || {});
+      if (!allPG.length) {
+        showToast("0 MedPYQ questions loaded. Check MedPYQ Sign In inside ⚙️ Settings.", "warning");
         return;
       }
       if (window.innerWidth < 1024) switchTab("mentor");
       setAiBusy(true);
-      const sample = pgEntries.slice(0, 3).map(([qid, obj], i) =>
-        `${i + 1}. [${qid} | ${obj.exam || "PG"}] ${stripHtml(obj.stem).slice(0, 220)}`
+      const shuffled = [...allPG].sort(() => 0.5 - Math.random()).slice(0, 3);
+      const sample = shuffled.map((obj, i) =>
+        `${i + 1}. [${obj.q} | ${obj.exam}] ${stripHtml(obj.stem).slice(0, 220)}`
       ).join("\n");
       try {
         const reply = await callGemini({
@@ -1309,7 +1382,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
         });
         state.activeMission.stage = "TEST";
         state.lastTestQuestions = reply;
-        appendChat("model", `**MEDPYQ PG BRIDGE DRILL (${state.vault.subjectKey})**\n${reply}`, "DRILL");
+        appendChat("model", `**MEDPYQ PG DRILL (${state.vault.subjectKey})**\n${reply}`, "DRILL");
       } catch (err) {
         showToast(err.message, "error");
       } finally {
@@ -1860,11 +1933,26 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
         const email = el.loginEmail.value.trim().toLowerCase();
         if (!ADMIN_EMAILS.includes(email)) throw new Error("Access denied: Owner/Admin email required.");
         await signInWithEmailAndPassword(auth, email, el.loginPassword.value);
+        signInWithEmailAndPassword(medpyqAuth, email, el.loginPassword.value).catch(() => {});
       } catch (err) {
         el.loginError.textContent = err.message;
         el.loginError.classList.remove("hidden");
       } finally {
         el.loginSubmitBtn.disabled = false;
+      }
+    });
+
+    el.connectMedpyqBtn.addEventListener("click", async () => {
+      const email = prompt("MedPYQ Admin Email:", state.user?.email || "educateindiainstitute@gmail.com");
+      if (!email) return;
+      const pass = prompt(`MedPYQ Password for ${email}:`);
+      if (!pass) return;
+      try {
+        await signInWithEmailAndPassword(medpyqAuth, email.trim(), pass);
+        showToast("MedPYQ connected! Syncing full PG banks...", "success");
+        await loadActiveSubjectVault(true);
+      } catch (err) {
+        showToast(`MedPYQ login failed: ${err.message}`, "error");
       }
     });
 
@@ -1898,7 +1986,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       showToast("Settings saved & synced.", "success");
     });
     el.clearCacheBtn.addEventListener("click", async () => { await idbClear(); showToast("Local PYQ IndexedDB cache cleared.", "info"); });
-    el.logoutBtn.addEventListener("click", async () => { el.settingsModal.classList.add("hidden"); await signOut(auth); });
+    el.logoutBtn.addEventListener("click", async () => { el.settingsModal.classList.add("hidden"); await signOut(auth); signOut(medpyqAuth).catch(() => {}); });
 
     el.voiceToggleBtn.addEventListener("click", () => {
       state.voiceEnabled = !state.voiceEnabled;
@@ -1972,7 +2060,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }, 1000);
 
     switchTab("command");
-    appendChat("model", "**APEX MENTOR READY.** Tap **Sync PYQs** to pull your full Prof PYQs + MedPYQ bridge stems. Share your exam date sheet or any topic you want to master in chat, and I will update your goals and Active Mission automatically.", "ORDER");
+    appendChat("model", "**APEX MENTOR READY.** Tap **Sync PYQs** to pull all 19 Prof subjects + all 4 MedPYQ PG exams (NEET-PG, INI-CET, UPSC-CMS, FMGE). If MedPYQ shows 0, tap **⚙️ Settings → MedPYQ Sign In** once.", "ORDER");
   </script>
 </body>
 </html>
