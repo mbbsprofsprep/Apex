@@ -613,6 +613,40 @@
             <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Legacy API)</option>
           </select>
         </div>
+        <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-amber-400">🎙️ Mentor Voice Engine</label>
+            <button id="testVoiceBtn" type="button" class="px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Test Voice</button>
+          </div>
+          <select id="settingsVoiceEngine" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-bold text-white focus:outline-none focus:border-amber-500">
+            <option value="elevenlabs">ElevenLabs (Cassio Cruz / Custom Voice ID)</option>
+            <option value="gemini_tts">Gemini Studio TTS (Uses Your Gemini Key)</option>
+            <option value="browser">Browser / Android Local Voice (Free)</option>
+          </select>
+
+          <!-- ElevenLabs Options -->
+          <div id="elVoiceOpts" class="space-y-2">
+            <input id="settingsElKey" type="password" placeholder="ElevenLabs API Key (sk_...)" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-white focus:outline-none focus:border-amber-500" />
+            <input id="settingsElVoiceId" type="text" value="TY3h8ANhQUsJaa0Bga5F" placeholder="Voice ID (Default: Cassio Cruz)" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-amber-300 focus:outline-none focus:border-amber-500" />
+          </div>
+
+          <!-- Gemini Studio TTS Options -->
+          <div id="geminiVoiceOpts" class="hidden">
+            <select id="settingsGeminiVoice" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-amber-300 focus:outline-none">
+              <option value="Fenrir">Fenrir (Deep Commanding Male)</option>
+              <option value="Charon">Charon (Calm Authoritative Male)</option>
+              <option value="Orus">Orus (Firm Tactical Male)</option>
+              <option value="Gacrux">Gacrux (Expressive Studio)</option>
+              <option value="Puck">Puck (Energetic Male)</option>
+              <option value="Kore">Kore (Clear Female)</option>
+            </select>
+          </div>
+
+          <!-- Browser Local Voice Options -->
+          <div id="browserVoiceOpts" class="hidden">
+            <select id="settingsBrowserVoice" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"></select>
+          </div>
+        </div>
         <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-2">
           <div>
             <div class="text-[11px] font-bold text-zinc-200">MedPYQ Direct Vault Auth</div>
@@ -1839,19 +1873,111 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
     function stopSiren() { if (sirenInterval) { clearInterval(sirenInterval); sirenInterval = null; } }
 
-    function speakMentor(text) {
-      if (!state.voiceEnabled || !("speechSynthesis" in window)) return;
-      try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text.replace(/\*\*/g, "").replace(/[#•▸]/g, "").trim());
-        u.rate = state.voiceSpeed; u.pitch = 0.95;
-        u.onstart = () => el.stopSpeechBtn.classList.remove("hidden");
-        u.onend = u.onerror = () => el.stopSpeechBtn.classList.add("hidden");
-        window.speechSynthesis.speak(u);
-      } catch (_) {}
-    }
-    function stopSpeaking() { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); el.stopSpeechBtn.classList.add("hidden"); }
+    let activeAudioEl = null;
 
+    function getVoicePrefs() {
+      return {
+        engine: localStorage.getItem("apex_voice_engine") || "gemini_tts",
+        elKey: localStorage.getItem("apex_el_key") || "",
+        elVoiceId: localStorage.getItem("apex_el_voice_id") || "TY3h8ANhQUsJaa0Bga5F", // Cassio Cruz
+        geminiVoice: localStorage.getItem("apex_gemini_voice") || "Fenrir",
+        browserVoice: localStorage.getItem("apex_browser_voice") || ""
+      };
+    }
+
+    function pcm16Base64ToWavUrl(b64, sampleRate = 24000) {
+      const bin = atob(b64);
+      const pcm = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) pcm[i] = bin.charCodeAt(i);
+      const wav = new ArrayBuffer(44 + pcm.length);
+      const v = new DataView(wav);
+      const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); };
+      writeStr(0, "RIFF"); v.setUint32(4, 36 + pcm.length, true); writeStr(8, "WAVE");
+      writeStr(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+      v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+      writeStr(36, "data"); v.setUint32(40, pcm.length, true);
+      new Uint8Array(wav, 44).set(pcm);
+      return URL.createObjectURL(new Blob([wav], { type: "audio/wav" }));
+    }
+
+    function playAudioUrl(url) {
+      stopSpeaking();
+      activeAudioEl = new Audio(url);
+      activeAudioEl.playbackRate = state.voiceSpeed || 1.25;
+      el.stopSpeechBtn.classList.remove("hidden");
+      activeAudioEl.onended = activeAudioEl.onerror = () => {
+        el.stopSpeechBtn.classList.add("hidden");
+        URL.revokeObjectURL(url);
+        activeAudioEl = null;
+      };
+      activeAudioEl.play().catch(() => {});
+    }
+
+    function speakBrowserFallback(cleanText, voiceName = "") {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(cleanText);
+      const voices = window.speechSynthesis.getVoices();
+      const match = voices.find(v => v.name === voiceName);
+      if (match) u.voice = match;
+      u.rate = state.voiceSpeed; u.pitch = 0.95;
+      u.onstart = () => el.stopSpeechBtn.classList.remove("hidden");
+      u.onend = u.onerror = () => el.stopSpeechBtn.classList.add("hidden");
+      window.speechSynthesis.speak(u);
+    }
+
+    async function speakMentor(text) {
+      if (!state.voiceEnabled || !text) return;
+      const clean = text.replace(/\*\*/g, "").replace(/[#•▸]/g, "").trim().slice(0, 600);
+      if (!clean) return;
+      const prefs = getVoicePrefs();
+
+      try {
+        // 1. ElevenLabs (Cassio Cruz default: TY3h8ANhQUsJaa0Bga5F)
+        if (prefs.engine === "elevenlabs" && prefs.elKey) {
+          const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(prefs.elVoiceId)}`, {
+            method: "POST",
+            headers: { "xi-api-key": prefs.elKey, "Content-Type": "application/json", "Accept": "audio/mpeg" },
+            body: JSON.stringify({ text: clean, model_id: "eleven_multilingual_v2" })
+          });
+          if (!res.ok) throw new Error(`ElevenLabs HTTP ${res.status}`);
+          playAudioUrl(URL.createObjectURL(await res.blob()));
+          return;
+        }
+
+        // 2. Gemini Studio TTS (Uses your existing Gemini API key)
+        if (prefs.engine === "gemini_tts" && state.geminiKey) {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-tts:generateContent?key=${encodeURIComponent(state.geminiKey)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ role: "user", parts: [{ text: clean }] }],
+              generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: prefs.geminiVoice } } }
+              }
+            })
+          });
+          if (!res.ok) throw new Error(`Gemini TTS HTTP ${res.status}`);
+          const data = await res.json();
+          const b64 = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+          if (!b64) throw new Error("No audio returned");
+          playAudioUrl(pcm16Base64ToWavUrl(b64, 24000));
+          return;
+        }
+      } catch (err) {
+        console.warn("[Voice fallback]", err.message);
+      }
+
+      // 3. Fallback to selected Browser / Android voice
+      speakBrowserFallback(clean, prefs.browserVoice);
+    }
+
+    function stopSpeaking() {
+      if (activeAudioEl) { try { activeAudioEl.pause(); activeAudioEl = null; } catch (_) {} }
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      el.stopSpeechBtn.classList.add("hidden");
+    }
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) el.micBtn.classList.add("hidden");
     let recognition = null, isListening = false;
@@ -2525,7 +2651,44 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       }
       if (now.getSeconds() === 0) checkIdleTimeLimitProactive();
     }, 1000);
+function syncVoiceSettingsUI() {
+      const p = getVoicePrefs();
+      $("settingsVoiceEngine").value = p.engine;
+      $("settingsElKey").value = p.elKey;
+      $("settingsElVoiceId").value = p.elVoiceId;
+      $("settingsGeminiVoice").value = p.geminiVoice;
+      $("elVoiceOpts").classList.toggle("hidden", p.engine !== "elevenlabs");
+      $("geminiVoiceOpts").classList.toggle("hidden", p.engine !== "gemini_tts");
+      $("browserVoiceOpts").classList.toggle("hidden", p.engine !== "browser");
 
+      if ("speechSynthesis" in window) {
+        const voices = window.speechSynthesis.getVoices();
+        $("settingsBrowserVoice").innerHTML = voices.map(v =>
+          `<option value="${escapeHtml(v.name)}" ${v.name === p.browserVoice ? "selected" : ""}>${escapeHtml(v.name)} (${v.lang})</option>`
+        ).join("") || `<option value="">System Default</option>`;
+      }
+    }
+
+    $("settingsVoiceEngine").addEventListener("change", (e) => {
+      localStorage.setItem("apex_voice_engine", e.target.value);
+      syncVoiceSettingsUI();
+    });
+    el.openSettingsBtn.addEventListener("click", syncVoiceSettingsUI);
+    el.saveSettingsBtn.addEventListener("click", () => {
+      localStorage.setItem("apex_voice_engine", $("settingsVoiceEngine").value);
+      localStorage.setItem("apex_el_key", $("settingsElKey").value.trim());
+      localStorage.setItem("apex_el_voice_id", $("settingsElVoiceId").value.trim() || "TY3h8ANhQUsJaa0Bga5F");
+      localStorage.setItem("apex_gemini_voice", $("settingsGeminiVoice").value);
+      localStorage.setItem("apex_browser_voice", $("settingsBrowserVoice").value);
+    });
+    $("testVoiceBtn").addEventListener("click", () => {
+      localStorage.setItem("apex_voice_engine", $("settingsVoiceEngine").value);
+      localStorage.setItem("apex_el_key", $("settingsElKey").value.trim());
+      localStorage.setItem("apex_el_voice_id", $("settingsElVoiceId").value.trim() || "TY3h8ANhQUsJaa0Bga5F");
+      localStorage.setItem("apex_gemini_voice", $("settingsGeminiVoice").value);
+      localStorage.setItem("apex_browser_voice", $("settingsBrowserVoice").value);
+      speakMentor("APEX Commander online. Lock in your next 45-minute block.");
+    });
     switchTab("command");
     appendChat("model", "**APEX MENTOR READY.** Tap **🗓️ Build / Rebalance Plan** to generate today's objectives & weekly aims from your exam date sheet, or tap **🚑 Emergency Off** anytime you need to re-plan around an off-day.", "ORDER");
   </script>
