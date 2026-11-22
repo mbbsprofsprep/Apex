@@ -867,59 +867,91 @@
     // =========================================================================
     // 5. MBBS PROFS PREP + MEDPYQ VAULT LOADER (Version-Gated IndexedDB)
     // =========================================================================
+const SUBJECT_ALIASES = {
+      OPHTHALMOLOGY: ["OPHTHAL", "OPHTHALMOLOGY", "ophthal", "ophthalmology"],
+      PSM: ["CFM", "PSM", "cfm", "psm"],
+      ENT: ["ENT", "ent"],
+      ORTHOPAEDICS: ["ORTHOPAEDICS", "ORTHOPEDICS", "ORTHO", "orthopaedics", "ortho"],
+      PSYCHIATRY: ["PSYCHIATRY", "PSYCH", "psychiatry"],
+      MEDICINE: ["MEDICINE", "MED", "medicine"],
+      SURGERY: ["SURGERY", "SURG", "surgery"],
+      OBG: ["OBG", "OBGYN", "obg"],
+      PAEDIATRICS: ["PAEDIATRICS", "PEDIATRICS", "PAEDS", "paediatrics", "pediatrics"],
+      PATHOLOGY: ["PATHOLOGY", "PATHO", "pathology", "patho"],
+      PHARMACOLOGY: ["PHARMACOLOGY", "PHARMA", "pharmacology", "pharma"],
+      MICROBIOLOGY: ["MICROBIOLOGY", "MICRO", "microbiology", "micro"],
+      FMT: ["FMT", "fmt"]
+    };
+
     async function loadActiveSubjectVault(forceRefresh = false) {
       if (!state.user) return;
       const college = el.vaultCollegeSelect.value;
       const [subjectKey, bridgeSlug] = el.vaultSubjectSelect.value.split("|");
+      const aliases = SUBJECT_ALIASES[subjectKey] || [subjectKey, subjectKey.toLowerCase()];
+
       state.vault.college = college;
       state.vault.subjectKey = subjectKey;
       state.vault.bridgeSlug = bridgeSlug;
-
       el.vaultStatusText.textContent = `Loading ${college.toUpperCase()} / ${subjectKey}...`;
 
       try {
-        const metaSnap = await get(ref(db, `bank_meta/${college}/${subjectKey}/version`)).catch(() => null);
-        const remoteVer = Number(metaSnap?.val() || 1);
-        const cacheKey = `vault_${college}_${subjectKey}`;
-        let cached = !forceRefresh ? await idbGet(cacheKey) : null;
-
-        let bank = null, cross = null;
-        if (cached && cached.ver === remoteVer) {
-          bank = cached.bank;
-          cross = cached.cross;
-        } else {
-          const [bSnap, cSnap] = await Promise.all([
-            get(ref(db, `question_banks/${college}/${subjectKey}`)).catch(() => null),
-            get(ref(db, `cross_links/${bridgeSlug}`)).catch(() => null)
-          ]);
-          bank = bSnap?.val() || {};
-          cross = cSnap?.val() || {};
-          await idbSet(cacheKey, { ver: remoteVer, bank, cross });
+        // 1. Find matching bank_meta version across aliases
+        let matchedKey = aliases[0];
+        let remoteVer = 1;
+        for (const k of aliases) {
+          const mSnap = await get(ref(db, `bank_meta/${college}/${k}/version`)).catch(() => null);
+          if (mSnap && mSnap.exists()) { matchedKey = k; remoteVer = Number(mSnap.val() || 1); break; }
         }
 
-        const qnaData = Array.isArray(bank.qnaData) ? bank.qnaData : Object.values(bank.qnaData || {});
+        const cacheKey = `vault_${college}_${subjectKey}`;
+        let cached = !forceRefresh ? await idbGet(cacheKey) : null;
+        let bank = null, cross = null;
+
+        if (cached && cached.ver === remoteVer && cached.bank?.qnaData?.length) {
+          bank = cached.bank;
+          cross = cached.cross;
+          matchedKey = cached.matchedKey || matchedKey;
+        } else {
+          // 2. Try RTDB question_banks across all aliases
+          for (const k of [matchedKey, ...aliases.filter(a => a !== matchedKey)]) {
+            const bSnap = await get(ref(db, `question_banks/${college}/${k}`)).catch(() => null);
+            if (bSnap && bSnap.exists()) { bank = bSnap.val(); matchedKey = k; break; }
+          }
+
+          // 3. Fallback to static GitHub JSON on mbbsprofsprep.github.io
+          if (!bank) {
+            for (const k of aliases) {
+              try {
+                const res = await fetch(`${k.toLowerCase()}_aiims_${college}_data.json`);
+                if (res.ok) { bank = await res.json(); matchedKey = k.toUpperCase(); break; }
+              } catch (_) {}
+            }
+          }
+
+          const cSnap = await get(ref(db, `cross_links/${bridgeSlug}`)).catch(() => null);
+          cross = cSnap?.val() || {};
+          bank = bank || {};
+          await idbSet(cacheKey, { ver: remoteVer, matchedKey, bank, cross });
+        }
+
+        // Save matchedKey so fetchGroundTruthAnswer() reads the exact right answers/ path too
+        state.vault.matchedKey = matchedKey;
+
+        const qnaData = Array.isArray(bank) ? bank : (Array.isArray(bank.qnaData) ? bank.qnaData : Object.values(bank.qnaData || {}));
         const curriculumData = Array.isArray(bank.curriculumData) ? bank.curriculumData : Object.values(bank.curriculumData || {});
 
-        // Compute repeat frequency from Teen Patti clusters
         const repeatMap = {};
         Object.values(cross.clusters || {}).forEach(cl => {
           const members = Array.isArray(cl.qids) ? cl.qids : Object.keys(cl.nodes || {});
           members.forEach(id => { repeatMap[String(id).toUpperCase()] = Math.max(repeatMap[String(id).toUpperCase()] || 1, members.length); });
         });
 
-        state.vault = {
-          ...state.vault,
-          qnaData, curriculumData, repeatMap,
-          pgCache: cross.shared_q_cache || {},
-          loaded: true
-        };
-
-        // Auto-merge chapters from curriculumData into Syllabus Matrix
+        state.vault = { ...state.vault, matchedKey, qnaData, curriculumData, repeatMap, pgCache: cross.shared_q_cache || {}, loaded: true };
         await mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData, repeatMap);
 
         const pgCount = Object.keys(state.vault.pgCache).length;
-        el.vaultStatusText.textContent = `✓ ${qnaData.length} Prof PYQs • ${pgCount} Linked MedPYQ PG Stems`;
-        showToast(`Loaded ${qnaData.length} Prof PYQs (${subjectKey})`, "success");
+        el.vaultStatusText.textContent = `✓ ${qnaData.length} Prof PYQs (${matchedKey}) • ${pgCount} Linked MedPYQ PG Stems`;
+        showToast(`Loaded ${qnaData.length} Prof PYQs (${matchedKey})`, "success");
       } catch (err) {
         el.vaultStatusText.textContent = `Error loading ${subjectKey}`;
         showToast(`Vault load failed: ${err.message}`, "error");
@@ -991,8 +1023,8 @@
 
     async function fetchGroundTruthAnswer(qId) {
       if (!qId) return "";
-      const { college, subjectKey } = state.vault;
-      const snap = await get(ref(db, `answers/${college}/${subjectKey}/${qId}/text`)).catch(() => null);
+      const key = state.vault.matchedKey || state.vault.subjectKey;
+      const snap = await get(ref(db, `answers/${state.vault.college}/${key}/${qId}/text`)).catch(() => null);
       return snap?.exists() ? stripHtml(snap.val()).slice(0, 2200) : "";
     }
 
