@@ -242,6 +242,24 @@
 
       <!-- TAB 1: COMMAND -->
       <section id="tab-command" class="tab-panel space-y-5">
+
+        <!-- Active Directives Banner (Date Sheet / Focus Override set via Chat) -->
+        <div id="directivesBanner" class="hidden bg-indigo-950/50 border border-indigo-500/40 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="space-y-1 min-w-0 flex-1">
+            <div id="directiveDateSheetRow" class="hidden text-xs text-indigo-200">
+              <span class="font-black uppercase text-[10px] text-indigo-400 mr-1.5">📅 Date Sheet:</span>
+              <span id="directiveDateSheetText"></span>
+            </div>
+            <div id="directiveFocusRow" class="hidden text-xs text-amber-200">
+              <span class="font-black uppercase text-[10px] text-amber-400 mr-1.5">🎯 Focus Override:</span>
+              <span id="directiveFocusText"></span>
+            </div>
+          </div>
+          <button id="clearFocusOverrideBtn" type="button" class="hidden shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700">
+            Clear Focus
+          </button>
+        </div>
+
         <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
@@ -249,7 +267,7 @@
               <h2 id="missionTopicTitle" class="text-lg sm:text-xl font-extrabold text-white mt-0.5">No Mission Assigned Yet</h2>
             </div>
             <div class="flex items-center gap-2">
-              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95" title="Quiz 3 linked MedPYQ PG stems for current subject">
+              <button id="bridgePgQuizBtn" type="button" class="px-3 py-2.5 rounded-xl text-xs font-bold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 transition active:scale-95" title="Quiz 3 MedPYQ PG stems for current subject">
                 MedPYQ PG Bridge
               </button>
               <button id="prescribeMissionBtn" type="button" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 shadow-lg shadow-amber-500/20 transition active:scale-95">
@@ -269,7 +287,7 @@
             </div>
             <div>
               <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Deliverable</div>
-              <div id="missionDeliverable" class="text-xs text-zinc-300 mt-0.5 line-clamp-2">Hit Prescribe or pick a chapter from Syllabus.</div>
+              <div id="missionDeliverable" class="text-xs text-zinc-300 mt-0.5 line-clamp-2">Hit Prescribe or chat your exam date sheet / focus topic.</div>
             </div>
           </div>
 
@@ -344,13 +362,13 @@
         </div>
       </section>
 
-      <!-- TAB 2: SYLLABUS & PYQ HEATMAP -->
+      <!-- TAB 2: SYLLABUS & PYQ MATRIX -->
       <section id="tab-syllabus" class="tab-panel hidden space-y-4">
         <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-2xl">
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
-              <h2 class="text-base font-extrabold text-white">Syllabus &amp; PYQ Repeat Matrix</h2>
-              <p class="text-xs text-zinc-400">Auto-synced from your <code class="text-amber-300">curriculumData</code> + Teen Patti repeat clusters</p>
+              <h2 class="text-base font-extrabold text-white">Syllabus &amp; PYQ Volume Matrix</h2>
+              <p class="text-xs text-zinc-400">Auto-synced from your <code class="text-amber-300">curriculumData</code> + raw Prof PYQ counts</p>
             </div>
             <div class="flex items-center gap-2">
               <select id="syllabusFilterSubject" class="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-amber-500">
@@ -481,9 +499,9 @@
 
       <div class="p-3 border-t border-zinc-800 bg-zinc-950/90">
         <div class="flex flex-wrap gap-1.5 mb-2.5">
+          <button type="button" data-quick="Analyze all Prof PYQs and MedPYQ stems in this subject and list the top 5 highest-yield topics I must master first." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">High-Yield Analysis</button>
           <button type="button" data-quick="Give me a 10-mark Prof answer skeleton (headings + diagram + viva traps) for my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-amber-500/20 hover:text-amber-300 text-zinc-300 border border-zinc-800 transition">10-Mark Skeleton</button>
           <button type="button" data-quick="Test me with 3 rapid-fire high-yield PYQs on my active mission." class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-rose-500/20 hover:text-rose-300 text-zinc-300 border border-zinc-800 transition">Quiz Me Now</button>
-          <button type="button" data-quick="I finished my block. Here is my recall dump:" class="quick-chip px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-emerald-500/20 hover:text-emerald-300 text-zinc-300 border border-zinc-800 transition">Submit Recall</button>
         </div>
 
         <form id="chatForm" class="flex items-end gap-2">
@@ -492,7 +510,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
           </button>
-          <textarea id="chatInput" rows="1" placeholder="Answer your mentor, dump recall points, or speak..." class="flex-1 resize-none px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 max-h-32 transition"></textarea>
+          <textarea id="chatInput" rows="1" placeholder="Share date sheet, set a focus topic, or answer your mentor..." class="flex-1 resize-none px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 max-h-32 transition"></textarea>
           <button id="sendChatBtn" type="submit" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 font-black text-sm transition active:scale-95 shrink-0">Send</button>
         </form>
       </div>
@@ -500,7 +518,7 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- SETTINGS MODAL (Updated 2026 Gemini Models + Cache Clear + Sign Out)  -->
+  <!-- SETTINGS MODAL                                                        -->
   <!-- ===================================================================== -->
   <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-md shadow-2xl space-y-4">
@@ -617,7 +635,7 @@
     };
 
     const COMMITMENT_PHRASE = "I am awake and starting now";
-    const IDB_NAME = "ApexMentorPYQCache_v2";
+    const IDB_NAME = "ApexMentorPYQCache_v3";
     const IDB_STORE = "vaults";
 
     const app = initializeApp(PROFS_FIREBASE_CONFIG);
@@ -638,13 +656,13 @@
         bridgeSlug: "ophthalmology",
         qnaData: [],
         curriculumData: [],
-        repeatMap: {},
         pgCache: {},
         loaded: false
       },
       bookmarks: {},
       profile: {
         xp: 0, level: 1, streak: 1, examDate: "2026-12-04",
+        dateSheet: "", focusOverride: "",
         dailyGoalHours: 8, wakeUpTime: "04:30", alarmArmed: false
       },
       activeMission: {
@@ -689,6 +707,9 @@
       navTabs: document.querySelectorAll(".nav-tab"), tabPanels: document.querySelectorAll(".tab-panel"),
       workspacePane: $("workspacePane"), mentorPane: $("mentorPane"),
       mobileMentorBadge: $("mobileMentorBadge"), mistakeCountBadge: $("mistakeCountBadge"),
+      directivesBanner: $("directivesBanner"), directiveDateSheetRow: $("directiveDateSheetRow"),
+      directiveDateSheetText: $("directiveDateSheetText"), directiveFocusRow: $("directiveFocusRow"),
+      directiveFocusText: $("directiveFocusText"), clearFocusOverrideBtn: $("clearFocusOverrideBtn"),
       missionTopicTitle: $("missionTopicTitle"), missionSubject: $("missionSubject"),
       missionDurationLabel: $("missionDurationLabel"), missionDeliverable: $("missionDeliverable"),
       prescribeMissionBtn: $("prescribeMissionBtn"), bridgePgQuizBtn: $("bridgePgQuizBtn"),
@@ -864,7 +885,7 @@
     }
 
     async function saveProfileToRTDB() {
-      renderHUD(); renderMissionCard();
+      renderHUD(); renderMissionCard(); renderDirectives();
       if (!state.user) return;
       await update(ref(db, "admin_private/apex_mentor"), {
         profile: state.profile,
@@ -881,7 +902,7 @@
     }
 
     // =========================================================================
-    // 5. MBBS PROFS PREP + MEDPYQ VAULT LOADER (Aliases + GitHub Fallback + IDB)
+    // 5. MBBS PROFS PREP + MEDPYQ BRIDGE LOADER (No Teen Patti Dependency)
     // =========================================================================
     async function loadActiveSubjectVault(forceRefresh = false) {
       if (!state.user) return;
@@ -904,18 +925,20 @@
 
         const cacheKey = `vault_${college}_${subjectKey}`;
         let cached = !forceRefresh ? await idbGet(cacheKey) : null;
-        let bank = null, cross = null;
+        let bank = null, pgCache = null;
 
         if (cached && cached.ver === remoteVer && cached.bank?.qnaData?.length) {
           bank = cached.bank;
-          cross = cached.cross;
+          pgCache = cached.pgCache || {};
           matchedKey = cached.matchedKey || matchedKey;
         } else {
+          // 1. Try RTDB question_banks across all aliases
           for (const k of [matchedKey, ...aliases.filter(a => a !== matchedKey)]) {
             const bSnap = await get(ref(db, `question_banks/${college}/${k}`)).catch(() => null);
             if (bSnap && bSnap.exists()) { bank = bSnap.val(); matchedKey = k; break; }
           }
 
+          // 2. Fallback to static GitHub JSON on mbbsprofsprep.github.io
           if (!bank) {
             for (const k of aliases) {
               try {
@@ -925,26 +948,21 @@
             }
           }
 
-          const cSnap = await get(ref(db, `cross_links/${bridgeSlug}`)).catch(() => null);
-          cross = cSnap?.val() || {};
+          // 3. Pull ONLY MedPYQ shared_q_cache from bridge (skips Teen Patti clusters/history)
+          const pgSnap = await get(ref(db, `cross_links/${bridgeSlug}/shared_q_cache`)).catch(() => null);
+          pgCache = pgSnap?.val() || {};
           bank = bank || {};
-          await idbSet(cacheKey, { ver: remoteVer, matchedKey, bank, cross });
+          await idbSet(cacheKey, { ver: remoteVer, matchedKey, bank, pgCache });
         }
 
         const qnaData = Array.isArray(bank) ? bank : (Array.isArray(bank.qnaData) ? bank.qnaData : Object.values(bank.qnaData || {}));
         const curriculumData = Array.isArray(bank.curriculumData) ? bank.curriculumData : Object.values(bank.curriculumData || {});
 
-        const repeatMap = {};
-        Object.values(cross.clusters || {}).forEach(cl => {
-          const members = Array.isArray(cl.qids) ? cl.qids : Object.keys(cl.nodes || {});
-          members.forEach(id => { repeatMap[String(id).toUpperCase()] = Math.max(repeatMap[String(id).toUpperCase()] || 1, members.length); });
-        });
+        state.vault = { ...state.vault, matchedKey, qnaData, curriculumData, pgCache, loaded: true };
+        await mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData);
 
-        state.vault = { ...state.vault, matchedKey, qnaData, curriculumData, repeatMap, pgCache: cross.shared_q_cache || {}, loaded: true };
-        await mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData, repeatMap);
-
-        const pgCount = Object.keys(state.vault.pgCache).length;
-        el.vaultStatusText.textContent = `✓ ${qnaData.length} Prof PYQs (${matchedKey}) • ${pgCount} Linked MedPYQ PG Stems`;
+        const pgCount = Object.keys(pgCache).length;
+        el.vaultStatusText.textContent = `✓ ${qnaData.length} Prof PYQs (${matchedKey}) • ${pgCount} MedPYQ Bridge Stems`;
         showToast(`Loaded ${qnaData.length} Prof PYQs (${matchedKey})`, "success");
       } catch (err) {
         el.vaultStatusText.textContent = `Error loading ${subjectKey}`;
@@ -952,7 +970,7 @@
       }
     }
 
-    async function mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData, repeatMap) {
+    async function mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData) {
       const chapters = [];
       curriculumData.forEach(item => {
         if (typeof item === "string") chapters.push(item);
@@ -964,54 +982,62 @@
       chapters.forEach(ch => {
         const slug = `${subjectKey}_${ch}`.replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 64);
         const matchingQs = qnaData.filter(q => JSON.stringify(q.chapter || "").toLowerCase().includes(ch.toLowerCase()));
-        const maxRepeat = matchingQs.reduce((mx, q) => Math.max(mx, repeatMap[String(q.q).toUpperCase()] || 1), 1);
-
         const existing = state.syllabus.find(s => s.id === slug);
         if (!existing) {
-          const obj = { subject: subjectKey, topic: ch, mastery: 15, status: "Untouched", pyqCount: matchingQs.length, maxRepeat, createdAt: Date.now() };
+          const obj = { subject: subjectKey, topic: ch, mastery: 15, status: "Untouched", pyqCount: matchingQs.length, createdAt: Date.now() };
           state.syllabus.push({ id: slug, ...obj });
           updates[`admin_private/apex_mentor/syllabus/${slug}`] = obj;
         } else {
           existing.pyqCount = matchingQs.length;
-          existing.maxRepeat = maxRepeat;
         }
       });
 
       if (Object.keys(updates).length && state.user) {
         await update(ref(db), updates).catch(() => {});
       }
-      state.syllabus.sort((a, b) => (a.mastery || 0) - (b.mastery || 0));
+      state.syllabus.sort((a, b) => (b.pyqCount || 0) - (a.pyqCount || 0));
       renderSyllabus();
     }
 
     function buildSubjectPYQPromptContext(chapterFilter = "") {
-      const { subjectKey, qnaData, repeatMap, pgCache } = state.vault;
+      const { subjectKey, qnaData, pgCache } = state.vault;
       if (!qnaData.length) return "No PYQ bank loaded yet.";
+
+      // Chapter-wise PYQ distribution so AI sees the entire subject weightage
+      const chCounts = {};
+      qnaData.forEach(q => {
+        const chs = Array.isArray(q.chapter) ? q.chapter : [q.chapter || "General"];
+        chs.forEach(c => { chCounts[c] = (chCounts[c] || 0) + 1; });
+      });
+      const chapterSummary = Object.entries(chCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 15)
+        .map(([ch, cnt]) => `${ch} (${cnt} Qs)`)
+        .join(", ");
 
       const filtered = qnaData
         .filter(q => !chapterFilter || JSON.stringify(q.chapter || "").toLowerCase().includes(chapterFilter.toLowerCase()))
         .map(q => ({
           id: q.q,
           type: q.type || "Theory",
-          repeats: repeatMap[String(q.q).toUpperCase()] || 1,
           batch: Array.isArray(q.examBatch) ? q.examBatch.join("/") : (q.examBatch || ""),
-          stem: stripHtml(q.stem).slice(0, 180),
+          stem: stripHtml(q.stem).slice(0, 170),
           key: q.ans_key || ""
-        }))
-        .sort((a, b) => b.repeats - a.repeats);
+        }));
 
-      const topTheory = filtered.filter(x => x.type !== "MCQ").slice(0, 12);
-      const topMcq = filtered.filter(x => x.type === "MCQ").slice(0, 8);
-      const topPG = Object.entries(pgCache).slice(0, 5).map(([qid, obj]) =>
-        `- [${qid} | ${obj.exam || "MedPYQ"} | Key:${obj.ans_key || ""}] ${stripHtml(obj.stem).slice(0, 160)}`
+      const topTheory = filtered.filter(x => x.type !== "MCQ").slice(0, 18);
+      const topMcq = filtered.filter(x => x.type === "MCQ").slice(0, 10);
+      const topPG = Object.entries(pgCache).slice(0, 8).map(([qid, obj]) =>
+        `- [${qid} | ${obj.exam || "MedPYQ"} | Key:${obj.ans_key || ""}] ${stripHtml(obj.stem).slice(0, 150)}`
       );
 
       return [
-        `PROF THEORY PYQs (${subjectKey}${chapterFilter ? " - " + chapterFilter : ""}):`,
-        ...topTheory.map(q => `- [${q.id} | ${q.repeats}x | ${q.batch}] ${q.stem}`),
+        `CHAPTER PYQ DISTRIBUTION (${subjectKey}): ${chapterSummary}`,
+        `PROF THEORY PYQs (${chapterFilter || "All Chapters"}):`,
+        ...topTheory.map(q => `- [${q.id} | ${q.batch}] ${q.stem}`),
         `PROF MCQs:`,
         ...topMcq.map(q => `- [${q.id} | Key:${q.key}] ${q.stem}`),
-        topPG.length ? `LINKED MEDPYQ PG STEMS:\n${topPG.join("\n")}` : ""
+        topPG.length ? `MEDPYQ BRIDGE PG STEMS:\n${topPG.join("\n")}` : ""
       ].join("\n");
     }
 
@@ -1059,11 +1085,17 @@
       const focusMinsToday = todayLogs.reduce((s, l) => s + (l.duration || 0), 0);
       const weakTopics = state.syllabus
         .filter(t => t.subject === state.vault.subjectKey && (t.mastery || 0) < 50)
-        .slice(0, 6)
-        .map(t => `${t.topic} (${t.mastery}%, ${t.pyqCount || 0} PYQs, ${t.maxRepeat || 1}x repeat)`)
+        .slice(0, 8)
+        .map(t => `${t.topic} (${t.mastery}%, ${t.pyqCount || 0} PYQs)`)
         .join("; ") || "None";
 
-      return `You are APEX MENTOR — a direct, high-standards tactical study commander for a 3rd-year MBBS student preparing for Profs (Target: ${state.profile.examDate}) and INI-CET/NEET-PG.
+      return `You are APEX MENTOR — a direct, tactical study commander for a 3rd-year MBBS student preparing for Profs (Next Exam: ${state.profile.examDate}) and INI-CET/NEET-PG.
+Analyze the raw Prof PYQs + MedPYQ bridge stems below yourself to identify high-yield topics—never rely on manual link counts.
+
+STUDENT DIRECTIVES (HIGHEST PRIORITY — ALWAYS OBEY):
+- Exam Date Sheet: ${state.profile.dateSheet || "Not set yet"}
+- Current Focus Override: ${state.profile.focusOverride || "None (follow weakest high-yield chapters)"}
+
 CURRENT STATE:
 - Active Vault: ${state.vault.college.toUpperCase()} / ${state.vault.subjectKey} (${state.vault.matchedKey})
 - Active Mission: [${state.activeMission.subject}] ${state.activeMission.topic} (QID: ${state.activeMission.qid || "General"}) | Stage: ${state.activeMission.stage}
@@ -1085,7 +1117,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
 
       try {
         const raw = await callGemini({
-          contents: [{ role: "user", parts: [{ text: "Inspect my weakest chapters and highest-repeat Prof PYQs in the vault context. Prescribe ONE direct study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
+          contents: [{ role: "user", parts: [{ text: "Respect my Exam Date Sheet and Focus Override first. Analyze all raw Prof PYQs and MedPYQ bridge stems in the vault context to prescribe ONE direct high-yield study mission (pick a real chapter and a real QID from the PYQ list if available)." }] }],
           systemInstruction: { parts: [{ text: buildCommanderContext() }] },
           generationConfig: {
             responseMimeType: "application/json",
@@ -1262,7 +1294,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     async function triggerMedPYQBridgeQuiz() {
       const pgEntries = Object.entries(state.vault.pgCache || {});
       if (!pgEntries.length) {
-        showToast("No linked MedPYQ PG stems cached for this subject yet.", "warning");
+        showToast("No MedPYQ PG bridge stems cached for this subject yet.", "warning");
         return;
       }
       if (window.innerWidth < 1024) switchTab("mentor");
@@ -1272,7 +1304,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       ).join("\n");
       try {
         const reply = await callGemini({
-          contents: [{ role: "user", parts: [{ text: `Quiz me on these 3 real linked MedPYQ PG stems for ${state.vault.subjectKey} without revealing the answer keys yet:\n${sample}` }] }],
+          contents: [{ role: "user", parts: [{ text: `Quiz me on these 3 real MedPYQ PG stems for ${state.vault.subjectKey} without revealing the answer keys yet:\n${sample}` }] }],
           systemInstruction: { parts: [{ text: buildCommanderContext() }] }
         });
         state.activeMission.stage = "TEST";
@@ -1301,7 +1333,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     async function addSyllabusTopic(subject, topic, mastery) {
       const m = Math.max(0, Math.min(100, parseInt(mastery, 10) || 0));
       const id = `t_${Date.now()}`;
-      const item = { subject: subject.trim(), topic: topic.trim(), mastery: m, status: computeStatus(m), pyqCount: 0, maxRepeat: 1, createdAt: Date.now() };
+      const item = { subject: subject.trim(), topic: topic.trim(), mastery: m, status: computeStatus(m), pyqCount: 0, createdAt: Date.now() };
       state.syllabus.push({ id, ...item });
       renderSyllabus();
       if (state.user) await set(ref(db, `admin_private/apex_mentor/syllabus/${id}`), item);
@@ -1518,7 +1550,18 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     // =========================================================================
     // 10. RENDERERS
     // =========================================================================
-    function renderAllUI() { renderHUD(); renderMissionCard(); updateTimerUI(); renderAlarmSettings(); renderSyllabus(); renderDueBookmarks(); renderMistakes(); renderAnalytics(); renderChat(); }
+    function renderAllUI() { renderHUD(); renderDirectives(); renderMissionCard(); updateTimerUI(); renderAlarmSettings(); renderSyllabus(); renderDueBookmarks(); renderMistakes(); renderAnalytics(); renderChat(); }
+
+    function renderDirectives() {
+      const ds = (state.profile.dateSheet || "").trim();
+      const fo = (state.profile.focusOverride || "").trim();
+      el.directivesBanner.classList.toggle("hidden", !ds && !fo);
+      el.directiveDateSheetRow.classList.toggle("hidden", !ds);
+      el.directiveDateSheetText.textContent = ds;
+      el.directiveFocusRow.classList.toggle("hidden", !fo);
+      el.directiveFocusText.textContent = fo;
+      el.clearFocusOverrideBtn.classList.toggle("hidden", !fo);
+    }
 
     function renderHUD() {
       const target = new Date(state.profile.examDate + "T00:00:00");
@@ -1582,7 +1625,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-zinc-900 text-amber-300 border border-zinc-800">${escapeHtml(t.subject)}</span>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800">${t.pyqCount || 0} PYQs</span>
-              ${(t.maxRepeat || 1) > 1 ? `<span class="text-[10px] font-black px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">🔥 ${t.maxRepeat}× Repeat</span>` : ""}
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">${escapeHtml(t.status || "Untouched")}</span>
             </div>
             <div class="text-sm font-bold text-white mt-1 truncate">${escapeHtml(t.topic)}</div>
             <div class="flex items-center gap-2.5 mt-2">
@@ -1693,6 +1736,9 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
     }
 
+    // =========================================================================
+    // 11. AGENTIC CHAT ROUTER (Auto-Updates Date Sheet, Focus & Active Mission)
+    // =========================================================================
     async function handleChatSubmit(rawText) {
       const text = rawText.trim();
       if (!text || state.isAiBusy) return;
@@ -1707,12 +1753,72 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       try {
         const recent = state.chatHistory.slice(-8).map(m => ({ role: m.role === "user" ? "user" : "model", parts: [{ text: m.text }] }));
         while (recent.length > 1 && recent[0].role !== "user") recent.shift();
-        const reply = await callGemini({
+
+        const raw = await callGemini({
           contents: recent,
-          systemInstruction: { parts: [{ text: buildCommanderContext() + "\nKeep replies sharp, tactical, grounded in the PYQ vault above." }] }
+          systemInstruction: {
+            parts: [{
+              text: buildCommanderContext() +
+                `\nIf the student shares an exam date sheet, changes their target exam date, or asks to focus on/master a specific topic right now, populate the corresponding update fields so the app updates their goals and Active Mission immediately. Otherwise leave update fields empty.`
+            }]
+          },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                reply: { type: "STRING" },
+                examDate: { type: "STRING", description: "YYYY-MM-DD only if student gave a new next exam date" },
+                dateSheet: { type: "STRING", description: "Compact summary of exam schedule if student shared a date sheet" },
+                focusOverride: { type: "STRING", description: "Specific topic/subject focus if student asked to prioritize something" },
+                newMissionSubject: { type: "STRING" },
+                newMissionTopic: { type: "STRING" },
+                newMissionDuration: { type: "INTEGER" },
+                newMissionDeliverable: { type: "STRING" }
+              },
+              required: ["reply"]
+            }
+          }
         });
-        appendChat("model", reply);
-        speakMentor(reply);
+
+        let parsed;
+        try { parsed = safeParseJSON(raw); } catch (_) { parsed = { reply: raw }; }
+
+        const updatedNotes = [];
+        if (parsed.examDate && /^\d{4}-\d{2}-\d{2}$/.test(parsed.examDate)) {
+          state.profile.examDate = parsed.examDate;
+          updatedNotes.push(`Exam Date → ${parsed.examDate}`);
+        }
+        if (parsed.dateSheet) {
+          state.profile.dateSheet = parsed.dateSheet;
+          updatedNotes.push("Date Sheet saved");
+        }
+        if (parsed.focusOverride) {
+          state.profile.focusOverride = parsed.focusOverride;
+          updatedNotes.push(`Focus → ${parsed.focusOverride}`);
+        }
+        if (parsed.newMissionTopic) {
+          const dur = Math.max(15, Math.min(90, parsed.newMissionDuration || 45));
+          state.activeMission = {
+            id: Date.now().toString(),
+            qid: "",
+            subject: parsed.newMissionSubject || state.vault.subjectKey,
+            topic: parsed.newMissionTopic,
+            durationMinutes: dur,
+            deliverable: parsed.newMissionDeliverable || `Master ${parsed.newMissionTopic} based on your PYQ vault.`,
+            stage: "STUDY"
+          };
+          setTimerDuration(dur);
+          updatedNotes.push(`Mission → ${parsed.newMissionTopic}`);
+        }
+
+        if (updatedNotes.length) {
+          await saveProfileToRTDB();
+          showToast(`Commander updated: ${updatedNotes.join(" • ")}`, "success");
+        }
+
+        appendChat("model", parsed.reply || "Understood.", updatedNotes.length ? "UPDATED" : null);
+        speakMentor(parsed.reply || "");
       } catch (err) {
         appendChat("model", `Error: ${err.message}`);
       } finally {
@@ -1744,7 +1850,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 11. EVENT BINDINGS & BOOT
+    // 12. EVENT BINDINGS & BOOT
     // =========================================================================
     el.loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1760,6 +1866,12 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       } finally {
         el.loginSubmitBtn.disabled = false;
       }
+    });
+
+    el.clearFocusOverrideBtn.addEventListener("click", async () => {
+      state.profile.focusOverride = "";
+      await saveProfileToRTDB();
+      showToast("Focus override cleared.", "info");
     });
 
     el.syncVaultBtn.addEventListener("click", () => loadActiveSubjectVault(true));
@@ -1860,7 +1972,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }, 1000);
 
     switchTab("command");
-    appendChat("model", "**APEX MENTOR READY.** Sign in with your Admin account, verify your Gemini API key in ⚙️ Settings, and tap **Sync PYQs** to pull your AIIMS Prof PYQs + MedPYQ PG bridge.", "ORDER");
+    appendChat("model", "**APEX MENTOR READY.** Tap **Sync PYQs** to pull your full Prof PYQs + MedPYQ bridge stems. Share your exam date sheet or any topic you want to master in chat, and I will update your goals and Active Mission automatically.", "ORDER");
   </script>
 </body>
 </html>
