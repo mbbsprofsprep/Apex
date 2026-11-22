@@ -168,13 +168,13 @@
           </svg>
         </button>
 
-        <button id="openSettingsBtn" type="button" class="px-2.5 py-2 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition active:scale-95" title="Gemini API Key & Vault Settings">
+        <button id="openSettingsBtn" type="button" class="px-2.5 py-2 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 transition active:scale-95" title="Gemini API Key, Voice & Vault Settings">
           ⚙️
         </button>
       </div>
     </div>
 
-    <!-- Active PYQ Vault Selector Strip (All 19 Subjects) -->
+    <!-- Active PYQ Vault Selector Strip (All 19 Subjects + Dual .TXT Export) -->
     <div class="max-w-[1600px] mx-auto mt-2 flex flex-wrap items-center justify-between gap-2 bg-zinc-900/70 border border-zinc-800/80 rounded-xl px-3 py-1.5">
       <div class="flex items-center gap-2 flex-wrap">
         <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">PYQ Vault:</span>
@@ -208,8 +208,11 @@
         <button id="syncVaultBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition active:scale-95">
           Sync PYQs
         </button>
-        <button id="exportTxtBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition active:scale-95" title="Export all loaded Prof + MedPYQ questions to .txt">
+        <button id="exportTxtBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition active:scale-95" title="Export all Prof + MedPYQ questions (Qs only) to .txt (auto-splits if >1MB)">
           📥 Export .TXT
+        </button>
+        <button id="exportTxtSolBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition active:scale-95" title="Export all Prof + MedPYQ questions WITH solutions to .txt (auto-splits if >1MB)">
+          📥 Export + Solutions
         </button>
         <button id="quickMedpyqAuthBtn" type="button" class="hidden px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 animate-pulse transition">
           🔒 Sign In MedPYQ
@@ -564,7 +567,7 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- MODAL: EXTENSIVE EXAM DATE SHEET MANAGER (ADD / EDIT / DELETE)        -->
+  <!-- MODAL: EXTENSIVE EXAM DATE SHEET MANAGER                              -->
   <!-- ===================================================================== -->
   <div id="examScheduleModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
@@ -593,10 +596,10 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- SETTINGS MODAL                                                        -->
+  <!-- SETTINGS MODAL (Gemini Key, Voice Engine: Cassio Cruz/Gemini, MedPYQ) -->
   <!-- ===================================================================== -->
   <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-md shadow-2xl space-y-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-md shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-extrabold text-white">⚙️ APEX Commander Settings</h3>
         <button id="closeSettingsBtn" type="button" class="text-zinc-400 hover:text-white text-sm font-bold">✕</button>
@@ -616,6 +619,8 @@
             <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Legacy API)</option>
           </select>
         </div>
+
+        <!-- VOICE ENGINE PICKER (Cassio Cruz / Gemini Studio / Browser) -->
         <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-bold uppercase tracking-wider text-amber-400">🎙️ Mentor Voice Engine</label>
@@ -627,13 +632,11 @@
             <option value="browser">Browser / Android Local Voice (Free)</option>
           </select>
 
-          <!-- ElevenLabs Options -->
           <div id="elVoiceOpts" class="space-y-2">
             <input id="settingsElKey" type="password" placeholder="ElevenLabs API Key (sk_...)" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-white focus:outline-none focus:border-amber-500" />
             <input id="settingsElVoiceId" type="text" value="TY3h8ANhQUsJaa0Bga5F" placeholder="Voice ID (Default: Cassio Cruz)" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-amber-300 focus:outline-none focus:border-amber-500" />
           </div>
 
-          <!-- Gemini Studio TTS Options -->
           <div id="geminiVoiceOpts" class="hidden">
             <select id="settingsGeminiVoice" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-amber-300 focus:outline-none">
               <option value="Fenrir">Fenrir (Deep Commanding Male)</option>
@@ -645,11 +648,11 @@
             </select>
           </div>
 
-          <!-- Browser Local Voice Options -->
           <div id="browserVoiceOpts" class="hidden">
             <select id="settingsBrowserVoice" class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"></select>
           </div>
         </div>
+
         <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-2">
           <div>
             <div class="text-[11px] font-bold text-zinc-200">MedPYQ Direct Vault Auth</div>
@@ -698,7 +701,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION LOGIC (Dual Firebase RTDB + Adaptive Planner + Proactive) -->
+  <!-- APPLICATION LOGIC                                                     -->
   <!-- ===================================================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -751,9 +754,9 @@
     };
 
     const COMMITMENT_PHRASE = "I am awake and starting now";
-    const IDB_NAME = "ApexMentorPYQCache_v6";
+    const IDB_NAME = "ApexMentorPYQCache_v7";
     const IDB_STORE = "vaults";
-    const IDLE_CHECKIN_MS = 60 * 60 * 1000; // 60 minutes
+    const IDLE_CHECKIN_MS = 60 * 60 * 1000;
 
     const app = initializeApp(PROFS_FIREBASE_CONFIG);
     const auth = getAuth(app);
@@ -788,10 +791,10 @@
       profile: {
         xp: 0, level: 1, streak: 1,
         examDate: "2026-12-04",
-        examSchedule: [],       // [{ id, subject, paper, type, date }]
-        dailyObjectives: [],    // [{ id, subject, text, done, date }]
-        weeklyGoals: [],        // [{ id, text, targetDate, done }]
-        emergencyOffDays: [],   // ["YYYY-MM-DD"]
+        examSchedule: [],
+        dailyObjectives: [],
+        weeklyGoals: [],
+        emergencyOffDays: [],
         lastDailyCheckInDate: "",
         focusOverride: "",
         dailyGoalHours: 8, wakeUpTime: "04:30", alarmArmed: false
@@ -835,7 +838,8 @@
       wakeLockBtn: $("wakeLockBtn"), wakeLockDot: $("wakeLockDot"), wakeLockLabel: $("wakeLockLabel"),
       testAlarmHudBtn: $("testAlarmHudBtn"), openSettingsBtn: $("openSettingsBtn"),
       vaultCollegeSelect: $("vaultCollegeSelect"), vaultSubjectSelect: $("vaultSubjectSelect"),
-      syncVaultBtn: $("syncVaultBtn"), quickMedpyqAuthBtn: $("quickMedpyqAuthBtn"), vaultStatusText: $("vaultStatusText"),
+      syncVaultBtn: $("syncVaultBtn"), exportTxtBtn: $("exportTxtBtn"), exportTxtSolBtn: $("exportTxtSolBtn"),
+      quickMedpyqAuthBtn: $("quickMedpyqAuthBtn"), vaultStatusText: $("vaultStatusText"),
       navTabs: document.querySelectorAll(".nav-tab"), tabPanels: document.querySelectorAll(".tab-panel"),
       workspacePane: $("workspacePane"), mentorPane: $("mentorPane"),
       mobileMentorBadge: $("mobileMentorBadge"), mistakeCountBadge: $("mistakeCountBadge"),
@@ -1108,7 +1112,7 @@
     }
 
     // =========================================================================
-    // 5. FULL 19-SUBJECT PROFS + ALL 4 MEDPYQ EXAMS LOADER
+    // 5. FULL 19-SUBJECT PROFS + ALL 4 MEDPYQ EXAMS LOADER + MULTI-PART .TXT EXPORT
     // =========================================================================
     async function loadActiveSubjectVault(forceRefresh = false) {
       if (!state.user) return;
@@ -1131,7 +1135,7 @@
           if (mSnap && mSnap.exists()) { matchedKey = k; remoteVer = Number(mSnap.val() || 1); break; }
         }
 
-        const cacheKey = `full_vault_v6_${college}_${subjectKey}`;
+        const cacheKey = `full_vault_v7_${college}_${subjectKey}`;
         const cached = !forceRefresh ? await idbGet(cacheKey) : null;
         let bank = null, pgCache = {}, pgCounts = { "neet-pg": 0, inicet: 0, "upsc-cms": 0, fmge: 0 };
         let medpyqDenied = false;
@@ -1177,7 +1181,8 @@
                   topic: Array.isArray(item.topic) ? item.topic.join(", ") : (item.topic || ""),
                   stem: String(item.stem || ""),
                   options: Array.isArray(item.options) ? item.options.map(String) : [],
-                  ans_key: String(item.ans_key || "")
+                  ans_key: String(item.ans_key || ""),
+                  explanation: String(item.explanation || "")
                 };
               });
             } catch (err) {
@@ -1212,7 +1217,8 @@
         showToast(`Vault load failed: ${err.message}`, "error");
       }
     }
-function exportAllPYQsToTxt() {
+
+    async function exportAllPYQsToTxt(includeSolutions = false) {
       const { college, subjectKey, matchedKey, qnaData, pgCache, pgCounts } = state.vault;
       const profList = Array.isArray(qnaData) ? qnaData : [];
       const pgList = Object.values(pgCache || {});
@@ -1222,19 +1228,34 @@ function exportAllPYQsToTxt() {
         return;
       }
 
+      let profAnswersMap = {};
+      if (includeSolutions) {
+        showToast("Fetching Prof solutions from Firebase...", "info");
+        const key = matchedKey || subjectKey;
+        const [a1, a2] = await Promise.all([
+          get(ref(db, `answers/${college}/${key}`)).catch(() => null),
+          key !== subjectKey ? get(ref(db, `answers/${college}/${subjectKey}`)).catch(() => null) : Promise.resolve(null)
+        ]);
+        profAnswersMap = { ...(a2?.val() || {}), ...(a1?.val() || {}) };
+      }
+
+      const getProfSol = (q) => {
+        const raw = profAnswersMap?.[q.q]?.text || q.explanation || q.answer || "";
+        return raw ? stripHtml(raw) : "";
+      };
+
       const lines = [];
       const sep = "=".repeat(72);
       const subSep = "-".repeat(52);
 
       lines.push(sep);
-      lines.push(`APEX MENTOR — COMPLETE PYQ EXPORT`);
+      lines.push(`APEX MENTOR — ${includeSolutions ? "PYQs + SOLUTIONS" : "QUESTIONS ONLY"} EXPORT`);
       lines.push(`Subject: ${subjectKey} (${matchedKey || subjectKey}) | College: AIIMS ${college.toUpperCase()}`);
       lines.push(`Exported: ${new Date().toLocaleString()}`);
       lines.push(`Totals: ${profList.length} Prof PYQs | ${pgList.length} MedPYQ PG Qs [NEET:${pgCounts["neet-pg"] || 0}, INI:${pgCounts.inicet || 0}, CMS:${pgCounts["upsc-cms"] || 0}, FMGE:${pgCounts.fmge || 0}]`);
       lines.push(sep);
       lines.push("");
 
-      // 1. MBBS PROFS THEORY PYQs
       const profTheory = profList.filter(q => (q.type || "Theory") !== "MCQ");
       lines.push(`SECTION 1: MBBS PROFS THEORY PYQs (${profTheory.length})`);
       lines.push(subSep);
@@ -1243,10 +1264,13 @@ function exportAllPYQsToTxt() {
         const batch = Array.isArray(q.examBatch) ? q.examBatch.join(", ") : (q.examBatch || "");
         lines.push(`${idx + 1}. [${q.q}] (${ch}${batch ? " | " + batch : ""})`);
         lines.push(`   ${stripHtml(q.stem)}`);
+        if (includeSolutions) {
+          const sol = getProfSol(q);
+          if (sol) lines.push(`   Solution: ${sol}`);
+        }
         lines.push("");
       });
 
-      // 2. MBBS PROFS MCQs
       const profMcq = profList.filter(q => (q.type || "") === "MCQ");
       lines.push(sep);
       lines.push(`SECTION 2: MBBS PROFS MCQs (${profMcq.length})`);
@@ -1257,15 +1281,16 @@ function exportAllPYQsToTxt() {
         lines.push(`${idx + 1}. [${q.q}] (${ch}${batch ? " | " + batch : ""})`);
         lines.push(`   ${stripHtml(q.stem)}`);
         if (Array.isArray(q.options)) {
-          q.options.forEach((opt, oi) => {
-            lines.push(`   ${String.fromCharCode(65 + oi)}) ${stripHtml(opt)}`);
-          });
+          q.options.forEach((opt, oi) => lines.push(`   ${String.fromCharCode(65 + oi)}) ${stripHtml(opt)}`));
         }
         if (q.ans_key) lines.push(`   Answer: ${q.ans_key}`);
+        if (includeSolutions) {
+          const sol = getProfSol(q);
+          if (sol) lines.push(`   Explanation: ${sol}`);
+        }
         lines.push("");
       });
 
-      // 3. MEDPYQ PG PYQs (NEET-PG, INI-CET, UPSC-CMS, FMGE)
       lines.push(sep);
       lines.push(`SECTION 3: MEDPYQ PG PYQs — NEET-PG / INI-CET / UPSC-CMS / FMGE (${pgList.length})`);
       lines.push(subSep);
@@ -1273,26 +1298,66 @@ function exportAllPYQsToTxt() {
         lines.push(`${idx + 1}. [${p.q} | ${p.exam || "PG"}${p.topic ? " | " + p.topic : ""}]`);
         lines.push(`   ${stripHtml(p.stem)}`);
         if (Array.isArray(p.options)) {
-          p.options.forEach((opt, oi) => {
-            lines.push(`   ${String.fromCharCode(65 + oi)}) ${stripHtml(opt)}`);
-          });
+          p.options.forEach((opt, oi) => lines.push(`   ${String.fromCharCode(65 + oi)}) ${stripHtml(opt)}`));
         }
         if (p.ans_key) lines.push(`   Answer: ${p.ans_key}`);
+        if (includeSolutions && p.explanation) lines.push(`   Explanation: ${stripHtml(p.explanation)}`);
         lines.push("");
       });
 
-      const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${subjectKey.toLowerCase()}_aiims_${college}_ALL_PYQs.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      const suffix = includeSolutions ? "WITH_SOLUTIONS" : "QS_ONLY";
+      const baseName = `${subjectKey.toLowerCase()}_aiims_${college}_${suffix}`;
+      const fullText = lines.join("\n");
+      const MAX_BYTES = 950 * 1024;
+      const enc = new TextEncoder();
 
-      showToast(`Exported ${profList.length + pgList.length} PYQs to .txt!`, "success");
+      const triggerDownload = (content, filename) => {
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      };
+
+      if (enc.encode(fullText).length <= MAX_BYTES) {
+        triggerDownload(fullText, `${baseName}.txt`);
+        showToast(`Exported ${profList.length + pgList.length} PYQs (1 file)!`, "success");
+        return;
+      }
+
+      const blocks = fullText.split("\n\n");
+      const parts = [];
+      let currentBlocks = [];
+      let currentBytes = 0;
+
+      for (const block of blocks) {
+        const blockStr = block + "\n\n";
+        const blockBytes = enc.encode(blockStr).length;
+        if (currentBytes + blockBytes > MAX_BYTES && currentBlocks.length > 0) {
+          parts.push(currentBlocks.join("\n\n"));
+          currentBlocks = [block];
+          currentBytes = blockBytes;
+        } else {
+          currentBlocks.push(block);
+          currentBytes += blockBytes;
+        }
+      }
+      if (currentBlocks.length > 0) parts.push(currentBlocks.join("\n\n"));
+
+      showToast(`File > 1 MB — downloading ${parts.length} parts...`, "info");
+      for (let i = 0; i < parts.length; i++) {
+        const partHeader = `=== PART ${i + 1} OF ${parts.length} (${baseName}) ===\n\n`;
+        triggerDownload(partHeader + parts[i], `${baseName}_PART_${i + 1}_of_${parts.length}.txt`);
+        if (i < parts.length - 1) await new Promise(r => setTimeout(r, 400));
+      }
+
+      showToast(`Exported ${profList.length + pgList.length} PYQs across ${parts.length} parts!`, "success");
     }
+
     async function mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData) {
       const chapters = [];
       curriculumData.forEach(item => {
@@ -1912,9 +1977,10 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 10. AUDIO, WAKE LOCK, TIMER & ALARM
+    // 10. VOICE ENGINE (ElevenLabs Cassio Cruz + Gemini Studio TTS + Browser)
     // =========================================================================
-    let audioCtx = null, sirenInterval = null, sirenStep = 0;
+    let audioCtx = null, sirenInterval = null, sirenStep = 0, activeAudioEl = null;
+
     function ensureAudioCtx() {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return null;
@@ -1956,13 +2022,11 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
     function stopSiren() { if (sirenInterval) { clearInterval(sirenInterval); sirenInterval = null; } }
 
-    let activeAudioEl = null;
-
     function getVoicePrefs() {
       return {
         engine: localStorage.getItem("apex_voice_engine") || "gemini_tts",
         elKey: localStorage.getItem("apex_el_key") || "",
-        elVoiceId: localStorage.getItem("apex_el_voice_id") || "TY3h8ANhQUsJaa0Bga5F", // Cassio Cruz
+        elVoiceId: localStorage.getItem("apex_el_voice_id") || "TY3h8ANhQUsJaa0Bga5F",
         geminiVoice: localStorage.getItem("apex_gemini_voice") || "Fenrir",
         browserVoice: localStorage.getItem("apex_browser_voice") || ""
       };
@@ -2016,7 +2080,6 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       const prefs = getVoicePrefs();
 
       try {
-        // 1. ElevenLabs (Cassio Cruz default: TY3h8ANhQUsJaa0Bga5F)
         if (prefs.engine === "elevenlabs" && prefs.elKey) {
           const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(prefs.elVoiceId)}`, {
             method: "POST",
@@ -2028,7 +2091,6 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
           return;
         }
 
-        // 2. Gemini Studio TTS (Uses your existing Gemini API key)
         if (prefs.engine === "gemini_tts" && state.geminiKey) {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash-tts:generateContent?key=${encodeURIComponent(state.geminiKey)}`, {
             method: "POST",
@@ -2052,7 +2114,6 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
         console.warn("[Voice fallback]", err.message);
       }
 
-      // 3. Fallback to selected Browser / Android voice
       speakBrowserFallback(clean, prefs.browserVoice);
     }
 
@@ -2061,6 +2122,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       el.stopSpeechBtn.classList.add("hidden");
     }
+
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) el.micBtn.classList.add("hidden");
     let recognition = null, isListening = false;
@@ -2418,7 +2480,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     }
 
     // =========================================================================
-    // 12. AGENTIC CHAT ROUTER (Updates Schedule, Objectives, Weekly & Off-Days)
+    // 12. AGENTIC CHAT ROUTER
     // =========================================================================
     async function handleChatSubmit(rawText) {
       const text = rawText.trim();
@@ -2597,6 +2659,37 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     // =========================================================================
     // 13. EVENT BINDINGS & BOOT
     // =========================================================================
+    function syncVoiceSettingsUI() {
+      const p = getVoicePrefs();
+      $("settingsVoiceEngine").value = p.engine;
+      $("settingsElKey").value = p.elKey;
+      $("settingsElVoiceId").value = p.elVoiceId;
+      $("settingsGeminiVoice").value = p.geminiVoice;
+      $("elVoiceOpts").classList.toggle("hidden", p.engine !== "elevenlabs");
+      $("geminiVoiceOpts").classList.toggle("hidden", p.engine !== "gemini_tts");
+      $("browserVoiceOpts").classList.toggle("hidden", p.engine !== "browser");
+
+      if ("speechSynthesis" in window) {
+        const voices = window.speechSynthesis.getVoices();
+        $("settingsBrowserVoice").innerHTML = voices.map(v =>
+          `<option value="${escapeHtml(v.name)}" ${v.name === p.browserVoice ? "selected" : ""}>${escapeHtml(v.name)} (${v.lang})</option>`
+        ).join("") || `<option value="">System Default</option>`;
+      }
+    }
+
+    $("settingsVoiceEngine").addEventListener("change", (e) => {
+      localStorage.setItem("apex_voice_engine", e.target.value);
+      syncVoiceSettingsUI();
+    });
+    $("testVoiceBtn").addEventListener("click", () => {
+      localStorage.setItem("apex_voice_engine", $("settingsVoiceEngine").value);
+      localStorage.setItem("apex_el_key", $("settingsElKey").value.trim());
+      localStorage.setItem("apex_el_voice_id", $("settingsElVoiceId").value.trim() || "TY3h8ANhQUsJaa0Bga5F");
+      localStorage.setItem("apex_gemini_voice", $("settingsGeminiVoice").value);
+      localStorage.setItem("apex_browser_voice", $("settingsBrowserVoice").value);
+      speakMentor("APEX Commander online. Lock in your next 45-minute block.");
+    });
+
     el.loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       el.loginError.classList.add("hidden");
@@ -2643,7 +2736,8 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     });
 
     el.syncVaultBtn.addEventListener("click", () => loadActiveSubjectVault(true));
-    $("exportTxtBtn").addEventListener("click", exportAllPYQsToTxt);
+    el.exportTxtBtn.addEventListener("click", () => exportAllPYQsToTxt(false));
+    el.exportTxtSolBtn.addEventListener("click", () => exportAllPYQsToTxt(true));
     el.vaultCollegeSelect.addEventListener("change", () => loadActiveSubjectVault(false));
     el.vaultSubjectSelect.addEventListener("change", () => loadActiveSubjectVault(false));
     el.navTabs.forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
@@ -2652,6 +2746,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     el.openSettingsBtn.addEventListener("click", () => {
       el.settingsGeminiKey.value = state.geminiKey;
       el.settingsGeminiModel.value = state.geminiModel;
+      syncVoiceSettingsUI();
       el.settingsModal.classList.remove("hidden");
     });
     el.closeSettingsBtn.addEventListener("click", () => el.settingsModal.classList.add("hidden"));
@@ -2660,6 +2755,11 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       state.geminiModel = el.settingsGeminiModel.value;
       localStorage.setItem("apex_gemini_key", state.geminiKey);
       localStorage.setItem("apex_gemini_model", state.geminiModel);
+      localStorage.setItem("apex_voice_engine", $("settingsVoiceEngine").value);
+      localStorage.setItem("apex_el_key", $("settingsElKey").value.trim());
+      localStorage.setItem("apex_el_voice_id", $("settingsElVoiceId").value.trim() || "TY3h8ANhQUsJaa0Bga5F");
+      localStorage.setItem("apex_gemini_voice", $("settingsGeminiVoice").value);
+      localStorage.setItem("apex_browser_voice", $("settingsBrowserVoice").value);
       if (state.user) {
         await update(ref(db, "admin_private/apex_mentor/config"), { geminiKey: state.geminiKey, geminiModel: state.geminiModel }).catch(() => {});
       }
@@ -2725,7 +2825,6 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     el.chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleChatSubmit(el.chatInput.value); } });
     el.quickChips.forEach(c => c.addEventListener("click", () => handleChatSubmit(c.dataset.quick)));
 
-    // Live Clock + Alarm + Proactive 60-Min Idle Check-In
     setInterval(() => {
       const now = new Date();
       el.liveClockDisplay.textContent = `Now: ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
@@ -2735,46 +2834,9 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
       }
       if (now.getSeconds() === 0) checkIdleTimeLimitProactive();
     }, 1000);
-function syncVoiceSettingsUI() {
-      const p = getVoicePrefs();
-      $("settingsVoiceEngine").value = p.engine;
-      $("settingsElKey").value = p.elKey;
-      $("settingsElVoiceId").value = p.elVoiceId;
-      $("settingsGeminiVoice").value = p.geminiVoice;
-      $("elVoiceOpts").classList.toggle("hidden", p.engine !== "elevenlabs");
-      $("geminiVoiceOpts").classList.toggle("hidden", p.engine !== "gemini_tts");
-      $("browserVoiceOpts").classList.toggle("hidden", p.engine !== "browser");
 
-      if ("speechSynthesis" in window) {
-        const voices = window.speechSynthesis.getVoices();
-        $("settingsBrowserVoice").innerHTML = voices.map(v =>
-          `<option value="${escapeHtml(v.name)}" ${v.name === p.browserVoice ? "selected" : ""}>${escapeHtml(v.name)} (${v.lang})</option>`
-        ).join("") || `<option value="">System Default</option>`;
-      }
-    }
-
-    $("settingsVoiceEngine").addEventListener("change", (e) => {
-      localStorage.setItem("apex_voice_engine", e.target.value);
-      syncVoiceSettingsUI();
-    });
-    el.openSettingsBtn.addEventListener("click", syncVoiceSettingsUI);
-    el.saveSettingsBtn.addEventListener("click", () => {
-      localStorage.setItem("apex_voice_engine", $("settingsVoiceEngine").value);
-      localStorage.setItem("apex_el_key", $("settingsElKey").value.trim());
-      localStorage.setItem("apex_el_voice_id", $("settingsElVoiceId").value.trim() || "TY3h8ANhQUsJaa0Bga5F");
-      localStorage.setItem("apex_gemini_voice", $("settingsGeminiVoice").value);
-      localStorage.setItem("apex_browser_voice", $("settingsBrowserVoice").value);
-    });
-    $("testVoiceBtn").addEventListener("click", () => {
-      localStorage.setItem("apex_voice_engine", $("settingsVoiceEngine").value);
-      localStorage.setItem("apex_el_key", $("settingsElKey").value.trim());
-      localStorage.setItem("apex_el_voice_id", $("settingsElVoiceId").value.trim() || "TY3h8ANhQUsJaa0Bga5F");
-      localStorage.setItem("apex_gemini_voice", $("settingsGeminiVoice").value);
-      localStorage.setItem("apex_browser_voice", $("settingsBrowserVoice").value);
-      speakMentor("APEX Commander online. Lock in your next 45-minute block.");
-    });
     switchTab("command");
-    appendChat("model", "**APEX MENTOR READY.** Tap **🗓️ Build / Rebalance Plan** to generate today's objectives & weekly aims from your exam date sheet, or tap **🚑 Emergency Off** anytime you need to re-plan around an off-day.", "ORDER");
+    appendChat("model", "**APEX MENTOR READY.** Tap **Sync PYQs** to pull Profs + MedPYQ, **📥 Export .TXT / + Solutions** to download (auto-splits >1 MB), and **⚙️ Settings** to configure your **Cassio Cruz / Gemini Studio** voice.", "ORDER");
   </script>
 </body>
 </html>
