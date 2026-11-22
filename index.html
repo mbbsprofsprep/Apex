@@ -208,6 +208,9 @@
         <button id="syncVaultBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition active:scale-95">
           Sync PYQs
         </button>
+        <button id="exportTxtBtn" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition active:scale-95" title="Export all loaded Prof + MedPYQ questions to .txt">
+          📥 Export .TXT
+        </button>
         <button id="quickMedpyqAuthBtn" type="button" class="hidden px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 animate-pulse transition">
           🔒 Sign In MedPYQ
         </button>
@@ -1209,7 +1212,87 @@
         showToast(`Vault load failed: ${err.message}`, "error");
       }
     }
+function exportAllPYQsToTxt() {
+      const { college, subjectKey, matchedKey, qnaData, pgCache, pgCounts } = state.vault;
+      const profList = Array.isArray(qnaData) ? qnaData : [];
+      const pgList = Object.values(pgCache || {});
 
+      if (!profList.length && !pgList.length) {
+        showToast("No PYQs loaded yet. Tap Sync PYQs first.", "warning");
+        return;
+      }
+
+      const lines = [];
+      const sep = "=".repeat(72);
+      const subSep = "-".repeat(52);
+
+      lines.push(sep);
+      lines.push(`APEX MENTOR — COMPLETE PYQ EXPORT`);
+      lines.push(`Subject: ${subjectKey} (${matchedKey || subjectKey}) | College: AIIMS ${college.toUpperCase()}`);
+      lines.push(`Exported: ${new Date().toLocaleString()}`);
+      lines.push(`Totals: ${profList.length} Prof PYQs | ${pgList.length} MedPYQ PG Qs [NEET:${pgCounts["neet-pg"] || 0}, INI:${pgCounts.inicet || 0}, CMS:${pgCounts["upsc-cms"] || 0}, FMGE:${pgCounts.fmge || 0}]`);
+      lines.push(sep);
+      lines.push("");
+
+      // 1. MBBS PROFS THEORY PYQs
+      const profTheory = profList.filter(q => (q.type || "Theory") !== "MCQ");
+      lines.push(`SECTION 1: MBBS PROFS THEORY PYQs (${profTheory.length})`);
+      lines.push(subSep);
+      profTheory.forEach((q, idx) => {
+        const ch = Array.isArray(q.chapter) ? q.chapter.join(" / ") : (q.chapter || "General");
+        const batch = Array.isArray(q.examBatch) ? q.examBatch.join(", ") : (q.examBatch || "");
+        lines.push(`${idx + 1}. [${q.q}] (${ch}${batch ? " | " + batch : ""})`);
+        lines.push(`   ${stripHtml(q.stem)}`);
+        lines.push("");
+      });
+
+      // 2. MBBS PROFS MCQs
+      const profMcq = profList.filter(q => (q.type || "") === "MCQ");
+      lines.push(sep);
+      lines.push(`SECTION 2: MBBS PROFS MCQs (${profMcq.length})`);
+      lines.push(subSep);
+      profMcq.forEach((q, idx) => {
+        const ch = Array.isArray(q.chapter) ? q.chapter.join(" / ") : (q.chapter || "General");
+        const batch = Array.isArray(q.examBatch) ? q.examBatch.join(", ") : (q.examBatch || "");
+        lines.push(`${idx + 1}. [${q.q}] (${ch}${batch ? " | " + batch : ""})`);
+        lines.push(`   ${stripHtml(q.stem)}`);
+        if (Array.isArray(q.options)) {
+          q.options.forEach((opt, oi) => {
+            lines.push(`   ${String.fromCharCode(65 + oi)}) ${stripHtml(opt)}`);
+          });
+        }
+        if (q.ans_key) lines.push(`   Answer: ${q.ans_key}`);
+        lines.push("");
+      });
+
+      // 3. MEDPYQ PG PYQs (NEET-PG, INI-CET, UPSC-CMS, FMGE)
+      lines.push(sep);
+      lines.push(`SECTION 3: MEDPYQ PG PYQs — NEET-PG / INI-CET / UPSC-CMS / FMGE (${pgList.length})`);
+      lines.push(subSep);
+      pgList.forEach((p, idx) => {
+        lines.push(`${idx + 1}. [${p.q} | ${p.exam || "PG"}${p.topic ? " | " + p.topic : ""}]`);
+        lines.push(`   ${stripHtml(p.stem)}`);
+        if (Array.isArray(p.options)) {
+          p.options.forEach((opt, oi) => {
+            lines.push(`   ${String.fromCharCode(65 + oi)}) ${stripHtml(opt)}`);
+          });
+        }
+        if (p.ans_key) lines.push(`   Answer: ${p.ans_key}`);
+        lines.push("");
+      });
+
+      const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${subjectKey.toLowerCase()}_aiims_${college}_ALL_PYQs.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+      showToast(`Exported ${profList.length + pgList.length} PYQs to .txt!`, "success");
+    }
     async function mergeCurriculumIntoSyllabus(subjectKey, curriculumData, qnaData) {
       const chapters = [];
       curriculumData.forEach(item => {
@@ -2560,6 +2643,7 @@ ${buildSubjectPYQPromptContext(state.activeMission.stage === "ASSIGN" ? "" : sta
     });
 
     el.syncVaultBtn.addEventListener("click", () => loadActiveSubjectVault(true));
+    $("exportTxtBtn").addEventListener("click", exportAllPYQsToTxt);
     el.vaultCollegeSelect.addEventListener("change", () => loadActiveSubjectVault(false));
     el.vaultSubjectSelect.addEventListener("change", () => loadActiveSubjectVault(false));
     el.navTabs.forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
